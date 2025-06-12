@@ -1,58 +1,84 @@
 # Niva Cart
 
-## This Project is a simple e-commerce application
-It has built with Next.js, TypeScript, and Tailwind CSS. It features a product listing page, product details page, and a shopping cart.
+## Project Overview
+A modern e-commerce application built with Next.js 15, showcasing frontend development practices and real-world implementation of e-commerce features. This project demonstrates expertise in building scalable, performant web applications with a focus on user experience and code quality.
 
-## API Endpoint
-I have used a fake store API for demonstration purposes.:
+## Technical Stack
+- **Frontend Framework**: Next.js 15 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS with custom design system
+- **State Management**: React Context API
+- **API Integration**: RESTful API consumption
+- **Deployment**: Vercel with CI/CD pipeline
+- **Version Control**: Git with GitHub
+- **Testing**: Jest and React Testing Library
+- **Code Quality**: ESLint, Prettier
+- **Performance**: Implemented image optimization, lazy loading, and code splitting
+
+## Key Features & Technical Achievements
+- **Responsive Design**: Implemented a fully responsive layout that works seamlessly across all device sizes
+- **Performance Optimization**: 
+  - Implemented dynamic imports for code splitting
+  - Optimized images using Next.js Image component
+  - Reduced bundle size through proper code organization
+- **State Management**: Built a robust cart management system using React Context API
+- **Type Safety**: Comprehensive TypeScript implementation ensuring type safety across the application
+- **Modern Architecture**: 
+  - Implemented App Router for better routing and performance
+  - Used Server Components where appropriate
+  - Implemented proper error boundaries and loading states
+- **CI/CD Pipeline**: Set up automated deployment pipeline using GitHub Actions and Vercel
+
+## API Integration
+The application integrates with the Fake Store API for demonstration purposes:
 https://fakestoreapi.com/products
 
 ## Getting Started
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Run tests
+npm test
 ```
 
-## Deploy on Vercel
+## Development Practices
+- **Code Organization**: Modular architecture with clear separation of concerns
+- **Component Design**: Reusable components with proper prop typing
+- **Error Handling**: Comprehensive error handling and user feedback
+- **Accessibility**: Implemented ARIA labels and semantic HTML
+- **Documentation**: Inline code documentation and clear component structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deployment
+The application is deployed on Vercel with automated CI/CD pipeline. The deployment process includes:
+- Automated testing
+- Build verification
+- Production deployment
+- Environment variable management
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### CI/CD Setup
+The project uses GitHub Actions for CI/CD and deploys to Vercel. Required secrets for deployment:
 
-## CI/CD with GitHub Actions and Vercel
+1. **VERCEL_TOKEN**: Authentication token for Vercel API
+2. **VERCEL_ORG_ID**: Organization identifier
+3. **VERCEL_PROJECT_ID**: Project identifier
 
-This project uses GitHub Actions for CI/CD and deploys to Vercel. To set up the required secrets for deployment:
+For detailed setup instructions, refer to the [Vercel Deployment Documentation](https://vercel.com/docs).
 
-### Getting Vercel Secrets
+## Future Improvements
+- Implement user authentication
+- Add payment gateway integration
+- Implement product search and filtering
+- Add product reviews and ratings
+- Implement wishlist functionality
+- Add admin dashboard
+- Implement analytics tracking
 
-1. **VERCEL_TOKEN**:
-   - Go to your [Vercel account settings](https://vercel.com/account/tokens)
-   - Create a new token with an appropriate name (e.g., "GitHub Actions")
-   - Copy the generated token
-
-2. **VERCEL_ORG_ID**:
-   - Go to your Vercel dashboard
-   - Navigate to Settings > General
-   - Copy your Organization ID
-
-3. **VERCEL_PROJECT_ID**:
-   - Go to your project in Vercel
-   - Navigate to Settings > General
-   - Copy your Project ID
-
-### Setting up GitHub Secrets
-
-1. Go to your GitHub repository
-2. Navigate to Settings > Secrets and variables > Actions
-3. Click on "New repository secret"
-4. Add each of the following secrets:
-   - Name: `VERCEL_TOKEN`, Value: (paste your token)
-   - Name: `VERCEL_ORG_ID`, Value: (paste your org ID)
-   - Name: `VERCEL_PROJECT_ID`, Value: (paste your project ID)
-
-Once these secrets are set up, the GitHub Actions workflow will be able to deploy your application to Vercel automatically when changes are pushed to the main branch.
+## Contributing
+Feel free to submit issues and enhancement requests!
