@@ -26,13 +26,21 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="p-4">
           <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
           <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
+          <p className="text-sm text-gray-500 mb-2">
+            Available: {product.quantity} in stock
+          </p>
         </div>
       </Link>
       <div className="p-4 pt-0">
         <button
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors"
+          className={`w-full py-2 px-4 rounded transition-colors ${
+            product.quantity > 0
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+          }`}
+          disabled={product.quantity === 0}
         >
-          Add to Cart
+          {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
         </button>
       </div>
     </div>
