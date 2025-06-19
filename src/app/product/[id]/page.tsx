@@ -1,31 +1,33 @@
-import { Product } from '@/types';
+import ProductDetails from "@/components/products/ProductDetails";
 import { notFound } from 'next/navigation';
-import ProductDetails from '@/components/products/ProductDetails';
-
-async function getProduct(id: string): Promise<Product> {
-  try {
-    const response = await fetch(`http://localhost:3000/api/products/${id}`, {
-      next: {
-        revalidate: 3600 // Cache for 1 hour
-      }
-    });
-    if (!response.ok) {
-      await notFound();
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error fetching product:', error);
-    notFound();
-  }
-}
+import { ProductResponse } from '@/types/api';
 
 type ProductPageProps = {
   params: Promise<{ id: string }>
 }
+
 export default async function ProductPage({ params }: ProductPageProps) {
   const { id } = await params;
-  const product = await getProduct(id);
-
-  return <ProductDetails product={product} />;
+  
+  try {
+    // Use the Next.js API route instead of direct external API call
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/product/${id}`, {
+      cache: 'force-cache',
+    });
+    
+    if (!response.ok) {
+      notFound();
+    }
+    
+    const result: ProductResponse = await response.json();
+    
+    if (!result.data) {
+      notFound();
+    }
+    
+    return <ProductDetails product={result.data} />;
+  } catch (error) {
+    console.error('Error in ProductPage:', error);
+    notFound();
+  }
 } 
