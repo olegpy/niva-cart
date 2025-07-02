@@ -1,16 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import Products from './index';
 import { Product } from '@/types';
-import { ImageProps } from 'next/image';
+import { CartProvider } from '@/context/CartContext';
 
-// Mock next/image
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: Omit<ImageProps, 'src'> & { src: string }) => {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={props.src} alt={props.alt} />;
-  },
-}));
+// Wrapper component for testing
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <CartProvider>{children}</CartProvider>
+);
 
 const mockProducts: Product[] = [
   {
@@ -35,7 +31,11 @@ const mockProducts: Product[] = [
 
 describe('Products', () => {
   it('renders a grid of products', () => {
-    render(<Products products={mockProducts} />);
+    render(
+      <TestWrapper>
+        <Products products={mockProducts} />
+      </TestWrapper>
+    );
     
     expect(screen.getByText('Test Product 1')).toBeInTheDocument();
     expect(screen.getByText('Test Product 2')).toBeInTheDocument();
@@ -44,14 +44,22 @@ describe('Products', () => {
   });
 
   it('renders empty state when no products are provided', () => {
-    render(<Products products={[]} />);
+    render(
+      <TestWrapper>
+        <Products products={[]} />
+      </TestWrapper>
+    );
     
     const productElements = screen.queryAllByRole('link', { name: /Test Product/ });
     expect(productElements).toHaveLength(0);
   });
 
   it('renders product images with correct alt text', () => {
-    render(<Products products={mockProducts} />);
+    render(
+      <TestWrapper>
+        <Products products={mockProducts} />
+      </TestWrapper>
+    );
     
     const images = screen.getAllByRole('img');
     expect(images).toHaveLength(mockProducts.length);

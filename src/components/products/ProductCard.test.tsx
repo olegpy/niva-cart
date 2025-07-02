@@ -1,16 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import ProductCard from './ProductCard';
 import { Product } from '@/types';
-import { ImageProps } from 'next/image';
+import { CartProvider } from '@/context/CartContext';
 
-// Mock next/image
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: Omit<ImageProps, 'src'> & { src: string }) => {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={props.src} alt={props.alt} />;
-  },
-}));
+// Wrapper component for testing
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <CartProvider>{children}</CartProvider>
+);
 
 const mockProduct: Product = {
   id: 1,
@@ -22,9 +18,23 @@ const mockProduct: Product = {
   quantity: 1
 };
 
+const mockOutOfStockProduct: Product = {
+  id: 2,
+  title: 'Out of Stock Product',
+  price: 49.99,
+  description: 'Out of Stock Description',
+  image: '/out-of-stock-image.jpg',
+  category: 'test-category',
+  quantity: 0
+};
+
 describe('ProductCard', () => {
   it('renders product information correctly', () => {
-    render(<ProductCard product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductCard product={mockProduct} />
+      </TestWrapper>
+    );
 
     expect(screen.getByText('Test Product')).toBeInTheDocument();
     expect(screen.getByText('$99.99')).toBeInTheDocument();
@@ -33,7 +43,11 @@ describe('ProductCard', () => {
   });
 
   it('has working Add to Cart button', () => {
-    render(<ProductCard product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductCard product={mockProduct} />
+      </TestWrapper>
+    );
 
     const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
     expect(addToCartButton).toBeEnabled();
@@ -41,17 +55,155 @@ describe('ProductCard', () => {
   });
 
   it('links to product detail page', () => {
-    render(<ProductCard product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductCard product={mockProduct} />
+      </TestWrapper>
+    );
 
     const productLink = screen.getByRole('link');
     expect(productLink).toHaveAttribute('href', '/product/1');
   });
 
   it('renders product image with correct attributes', () => {
-    render(<ProductCard product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductCard product={mockProduct} />
+      </TestWrapper>
+    );
 
     const image = screen.getByRole('img');
     expect(image).toHaveAttribute('src', '/test-image.jpg');
     expect(image).toHaveAttribute('alt', 'Test Product');
+  });
+
+  it('shows available quantity', () => {
+    render(
+      <TestWrapper>
+        <ProductCard product={mockProduct} />
+      </TestWrapper>
+    );
+
+    expect(screen.getByText('Available: 1 in stock')).toBeInTheDocument();
+  });
+
+  it('adds product to cart when Add to Cart button is clicked', () => {
+    render(
+      <TestWrapper>
+        <ProductCard product={mockProduct} />
+      </TestWrapper>
+    );
+
+    const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
+    
+    // Click the Add to Cart button
+    fireEvent.click(addToCartButton);
+    
+    // The button should still be enabled and functional
+    expect(addToCartButton).toBeEnabled();
+    expect(addToCartButton).toHaveClass('bg-blue-600');
+  });
+
+  it('handles multiple clicks on Add to Cart button', () => {
+    render(
+      <TestWrapper>
+        <ProductCard product={mockProduct} />
+      </TestWrapper>
+    );
+
+    const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
+    
+    // Click the button multiple times
+    fireEvent.click(addToCartButton);
+    fireEvent.click(addToCartButton);
+    fireEvent.click(addToCartButton);
+    
+    // Button should remain functional
+    expect(addToCartButton).toBeEnabled();
+    expect(addToCartButton).toHaveClass('bg-blue-600');
+  });
+
+  it('renders out of stock product correctly', () => {
+    render(
+      <TestWrapper>
+        <ProductCard product={mockOutOfStockProduct} />
+      </TestWrapper>
+    );
+
+    expect(screen.getByText('Out of Stock Product')).toBeInTheDocument();
+    expect(screen.getByText('$49.99')).toBeInTheDocument();
+    expect(screen.getByText('Available: 0 in stock')).toBeInTheDocument();
+  });
+
+  it('shows disabled button for out of stock product', () => {
+    render(
+      <TestWrapper>
+        <ProductCard product={mockOutOfStockProduct} />
+      </TestWrapper>
+    );
+
+    const outOfStockButton = screen.getByRole('button', { name: /out of stock/i });
+    expect(outOfStockButton).toBeDisabled();
+    expect(outOfStockButton).toHaveClass('bg-gray-400');
+    expect(outOfStockButton).toHaveClass('cursor-not-allowed');
+  });
+
+  it('does not allow adding out of stock product to cart', () => {
+    render(
+      <TestWrapper>
+        <ProductCard product={mockOutOfStockProduct} />
+      </TestWrapper>
+    );
+
+    const outOfStockButton = screen.getByRole('button', { name: /out of stock/i });
+    
+    // Try to click the disabled button
+    fireEvent.click(outOfStockButton);
+    
+    // Button should remain disabled
+    expect(outOfStockButton).toBeDisabled();
+    expect(outOfStockButton).toHaveClass('bg-gray-400');
+  });
+
+  it('shows correct button text based on stock status', () => {
+    // Test in-stock product
+    const { rerender } = render(
+      <TestWrapper>
+        <ProductCard product={mockProduct} />
+      </TestWrapper>
+    );
+
+    expect(screen.getByRole('button', { name: /add to cart/i })).toBeInTheDocument();
+
+    // Test out-of-stock product
+    rerender(
+      <TestWrapper>
+        <ProductCard product={mockOutOfStockProduct} />
+      </TestWrapper>
+    );
+
+    expect(screen.getByRole('button', { name: /out of stock/i })).toBeInTheDocument();
+  });
+
+  it('maintains product link functionality regardless of stock status', () => {
+    // Test in-stock product link
+    const { rerender } = render(
+      <TestWrapper>
+        <ProductCard product={mockProduct} />
+      </TestWrapper>
+    );
+
+    let productLink = screen.getByRole('link');
+    expect(productLink).toHaveAttribute('href', '/product/1');
+
+    // Test out-of-stock product link
+    rerender(
+      <TestWrapper>
+        <ProductCard product={mockOutOfStockProduct} />
+      </TestWrapper>
+    );
+
+    productLink = screen.getByRole('link');
+    expect(productLink).toHaveAttribute('href', '/product/2');
   });
 }); 

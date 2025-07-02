@@ -1,16 +1,12 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import ProductDetails from './ProductDetails';
 import { Product } from '@/types';
-import { ImageProps } from 'next/image';
+import { CartProvider } from '@/context/CartContext';
 
-// Mock next/image
-jest.mock('next/image', () => ({
-  __esModule: true,
-  default: (props: Omit<ImageProps, 'src'> & { src: string }) => {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={props.src} alt={props.alt} />;
-  },
-}));
+// Wrapper component for testing
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <CartProvider>{children}</CartProvider>
+);
 
 const mockProduct: Product = {
   id: 1,
@@ -24,37 +20,61 @@ const mockProduct: Product = {
 
 describe('ProductDetails', () => {
   it('renders product title correctly', () => {
-    render(<ProductDetails product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductDetails product={mockProduct} />
+      </TestWrapper>
+    );
     
     expect(screen.getByText('Test Product')).toBeInTheDocument();
   });
 
   it('renders product price correctly', () => {
-    render(<ProductDetails product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductDetails product={mockProduct} />
+      </TestWrapper>
+    );
     
     expect(screen.getByText('$99.99')).toBeInTheDocument();
   });
 
   it('renders product category correctly', () => {
-    render(<ProductDetails product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductDetails product={mockProduct} />
+      </TestWrapper>
+    );
     
     expect(screen.getByText('Category: test-category')).toBeInTheDocument();
   });
 
   it('renders product description correctly', () => {
-    render(<ProductDetails product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductDetails product={mockProduct} />
+      </TestWrapper>
+    );
     
     expect(screen.getByText('Test Description')).toBeInTheDocument();
   });
 
   it('renders product quantity correctly', () => {
-    render(<ProductDetails product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductDetails product={mockProduct} />
+      </TestWrapper>
+    );
     
     expect(screen.getByText('10')).toBeInTheDocument();
   });
 
   it('renders product image with correct attributes', () => {
-    render(<ProductDetails product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductDetails product={mockProduct} />
+      </TestWrapper>
+    );
     
     const image = screen.getByRole('img');
     expect(image).toHaveAttribute('src', '/test-image.jpg');
@@ -62,10 +82,72 @@ describe('ProductDetails', () => {
   });
 
   it('renders Add to Cart button', () => {
-    render(<ProductDetails product={mockProduct} />);
+    render(
+      <TestWrapper>
+        <ProductDetails product={mockProduct} />
+      </TestWrapper>
+    );
     
     const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
     expect(addToCartButton).toBeInTheDocument();
     expect(addToCartButton).toHaveClass('bg-blue-600');
+  });
+
+  it('adds product to cart when Add to Cart button is clicked', () => {
+    render(
+      <TestWrapper>
+        <ProductDetails product={mockProduct} />
+      </TestWrapper>
+    );
+    
+    const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
+    
+    // Click the Add to Cart button
+    fireEvent.click(addToCartButton);
+    
+    // Check that quantity controls appear
+    expect(screen.getByText('In Cart:')).toBeInTheDocument();
+    expect(screen.getByText('1', { selector: '.font-semibold.text-blue-600' })).toBeInTheDocument();
+  });
+
+  it('increments cart count when same product is added multiple times', () => {
+    render(
+      <TestWrapper>
+        <ProductDetails product={mockProduct} />
+      </TestWrapper>
+    );
+    
+    const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
+    
+    // Click Add to Cart button once to add to cart
+    fireEvent.click(addToCartButton);
+    
+    // Now use the increment button to increase quantity
+    const incrementButton = screen.getByRole('button', { name: /increase quantity/i });
+    fireEvent.click(incrementButton);
+    fireEvent.click(incrementButton);
+    
+    // Check that the quantity reflects the total
+    expect(screen.getByText('3', { selector: '.w-8.text-center.font-semibold' })).toBeInTheDocument();
+  });
+
+  it('handles multiple product additions correctly', () => {
+    render(
+      <TestWrapper>
+        <ProductDetails product={mockProduct} />
+      </TestWrapper>
+    );
+    
+    const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
+    
+    // Add product to cart
+    fireEvent.click(addToCartButton);
+    
+    // Use increment button to add one more
+    const incrementButton = screen.getByRole('button', { name: /increase quantity/i });
+    fireEvent.click(incrementButton);
+    
+    // Check that the quantity is correct
+    expect(screen.getByText('2', { selector: '.w-8.text-center.font-semibold' })).toBeInTheDocument();
   });
 }); 

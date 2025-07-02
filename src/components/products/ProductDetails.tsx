@@ -1,5 +1,7 @@
+'use client'
 import Image from 'next/image';
 import { Product } from '@/types';
+import ProductActions from './ProductActions';
 
 interface ProductDetailsProps {
   product: Product;
@@ -8,6 +10,7 @@ interface ProductDetailsProps {
 export default function ProductDetails({ product }: ProductDetailsProps) {
   return (
     <div className="max-w-7xl mx-auto">
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Product Image */}
         <div className="relative h-[500px] w-full">
@@ -39,18 +42,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
             <p className="text-gray-600">{product.description}</p>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-600">Available Quantity:</span>
-              <span className="font-semibold">{product.quantity}</span>
-            </div>
-
-            <button
-              className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
-            >
-              Add to Cart
-            </button>
-          </div>
+          <ProductActions product={product} variant="details" />
         </div>
       </div>
     </div>
