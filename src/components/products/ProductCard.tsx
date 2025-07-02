@@ -3,13 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/types';
+import ProductActions from './ProductActions';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       <Link href={`/product/${product.id}`}>
@@ -32,16 +32,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </Link>
       <div className="p-4 pt-0">
-        <button
-          className={`w-full py-2 px-4 rounded transition-colors ${
-            product.quantity > 0
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
-              : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-          }`}
-          disabled={product.quantity === 0}
-        >
-          {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
-        </button>
+        <ProductActions product={product} variant="card" />
       </div>
     </div>
   );
