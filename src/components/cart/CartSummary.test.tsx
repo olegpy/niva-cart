@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import CartSummary from './CartSummary';
 
 // Mock the useCart hook
@@ -11,18 +11,27 @@ import { useCart } from '@/context/CartContext';
 
 const mockUseCart = useCart as jest.MockedFunction<typeof useCart>;
 
+// Helper function to create a complete mock cart context
+const createMockCartContext = (overrides: Partial<ReturnType<typeof useCart>> = {}) => ({
+  items: [],
+  addToCart: jest.fn(),
+  removeFromCart: jest.fn(),
+  incrementQuantity: jest.fn(),
+  decrementQuantity: jest.fn(),
+  clearCart: jest.fn(),
+  getCartTotal: jest.fn().mockReturnValue(29.99),
+  getCartCount: jest.fn().mockReturnValue(2),
+  getItemQuantity: jest.fn(),
+  ...overrides,
+});
+
 describe('CartSummary', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders cart total and item count by default', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
-      getCartTotal: jest.fn().mockReturnValue(29.99),
-      getCartCount: jest.fn().mockReturnValue(2),
-    });
+    mockUseCart.mockReturnValue(createMockCartContext());
 
     render(<CartSummary />);
     
@@ -31,12 +40,10 @@ describe('CartSummary', () => {
   });
 
   it('renders singular "item" when count is 1', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
+    mockUseCart.mockReturnValue(createMockCartContext({
       getCartTotal: jest.fn().mockReturnValue(19.50),
       getCartCount: jest.fn().mockReturnValue(1),
-    });
+    }));
 
     render(<CartSummary />);
     
@@ -44,12 +51,10 @@ describe('CartSummary', () => {
   });
 
   it('renders plural "items" when count is 0', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
+    mockUseCart.mockReturnValue(createMockCartContext({
       getCartTotal: jest.fn().mockReturnValue(0),
       getCartCount: jest.fn().mockReturnValue(0),
-    });
+    }));
 
     render(<CartSummary />);
     
@@ -57,12 +62,7 @@ describe('CartSummary', () => {
   });
 
   it('hides item count when showItemCount is false', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
-      getCartTotal: jest.fn().mockReturnValue(29.99),
-      getCartCount: jest.fn().mockReturnValue(2),
-    });
+    mockUseCart.mockReturnValue(createMockCartContext());
 
     render(<CartSummary showItemCount={false} />);
     
@@ -71,12 +71,10 @@ describe('CartSummary', () => {
   });
 
   it('displays total with two decimal places', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
+    mockUseCart.mockReturnValue(createMockCartContext({
       getCartTotal: jest.fn().mockReturnValue(100),
       getCartCount: jest.fn().mockReturnValue(1),
-    });
+    }));
 
     render(<CartSummary />);
     
@@ -84,12 +82,10 @@ describe('CartSummary', () => {
   });
 
   it('displays total with decimal values correctly', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
+    mockUseCart.mockReturnValue(createMockCartContext({
       getCartTotal: jest.fn().mockReturnValue(19.5),
       getCartCount: jest.fn().mockReturnValue(1),
-    });
+    }));
 
     render(<CartSummary />);
     
@@ -97,12 +93,7 @@ describe('CartSummary', () => {
   });
 
   it('applies custom className', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
-      getCartTotal: jest.fn().mockReturnValue(29.99),
-      getCartCount: jest.fn().mockReturnValue(2),
-    });
+    mockUseCart.mockReturnValue(createMockCartContext());
 
     render(<CartSummary className="custom-class" />);
     
@@ -111,12 +102,7 @@ describe('CartSummary', () => {
   });
 
   it('has correct default styling classes', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
-      getCartTotal: jest.fn().mockReturnValue(29.99),
-      getCartCount: jest.fn().mockReturnValue(2),
-    });
+    mockUseCart.mockReturnValue(createMockCartContext());
 
     render(<CartSummary />);
     
@@ -125,12 +111,7 @@ describe('CartSummary', () => {
   });
 
   it('renders item count with correct styling', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
-      getCartTotal: jest.fn().mockReturnValue(29.99),
-      getCartCount: jest.fn().mockReturnValue(2),
-    });
+    mockUseCart.mockReturnValue(createMockCartContext());
 
     render(<CartSummary />);
     
@@ -139,12 +120,7 @@ describe('CartSummary', () => {
   });
 
   it('renders total with correct styling', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
-      getCartTotal: jest.fn().mockReturnValue(29.99),
-      getCartCount: jest.fn().mockReturnValue(2),
-    });
+    mockUseCart.mockReturnValue(createMockCartContext());
 
     render(<CartSummary />);
     
@@ -153,12 +129,10 @@ describe('CartSummary', () => {
   });
 
   it('handles large numbers correctly', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
+    mockUseCart.mockReturnValue(createMockCartContext({
       getCartTotal: jest.fn().mockReturnValue(1234.56),
       getCartCount: jest.fn().mockReturnValue(10),
-    });
+    }));
 
     render(<CartSummary />);
     
@@ -167,16 +141,92 @@ describe('CartSummary', () => {
   });
 
   it('handles zero total correctly', () => {
-    mockUseCart.mockReturnValue({
-      items: [],
-      addToCart: jest.fn(),
+    mockUseCart.mockReturnValue(createMockCartContext({
       getCartTotal: jest.fn().mockReturnValue(0),
       getCartCount: jest.fn().mockReturnValue(0),
-    });
+    }));
 
     render(<CartSummary />);
     
     expect(screen.getByText(/0\.00/)).toBeInTheDocument();
     expect(screen.getByText('0 items')).toBeInTheDocument();
+  });
+
+  describe('Clear Cart Button', () => {
+    it('does not render clear button by default', () => {
+      mockUseCart.mockReturnValue(createMockCartContext());
+
+      render(<CartSummary />);
+      
+      expect(screen.queryByRole('button', { name: /clear cart/i })).not.toBeInTheDocument();
+    });
+
+    it('renders clear button when showClearButton is true and cart has items', () => {
+      mockUseCart.mockReturnValue(createMockCartContext({
+        getCartCount: jest.fn().mockReturnValue(2),
+      }));
+
+      render(<CartSummary showClearButton={true} />);
+      
+      const clearButton = screen.getByRole('button', { name: /clear cart/i });
+      expect(clearButton).toBeInTheDocument();
+      expect(clearButton).toHaveTextContent('Clear Cart');
+    });
+
+    it('does not render clear button when cart is empty even if showClearButton is true', () => {
+      mockUseCart.mockReturnValue(createMockCartContext({
+        getCartCount: jest.fn().mockReturnValue(0),
+      }));
+
+      render(<CartSummary showClearButton={true} />);
+      
+      expect(screen.queryByRole('button', { name: /clear cart/i })).not.toBeInTheDocument();
+    });
+
+    it('calls clearCart when clear button is clicked', () => {
+      const mockClearCart = jest.fn();
+      mockUseCart.mockReturnValue(createMockCartContext({
+        getCartCount: jest.fn().mockReturnValue(2),
+        clearCart: mockClearCart,
+      }));
+
+      render(<CartSummary showClearButton={true} />);
+      
+      const clearButton = screen.getByRole('button', { name: /clear cart/i });
+      fireEvent.click(clearButton);
+      
+      expect(mockClearCart).toHaveBeenCalledTimes(1);
+    });
+
+    it('has correct styling for clear button', () => {
+      mockUseCart.mockReturnValue(createMockCartContext({
+        getCartCount: jest.fn().mockReturnValue(2),
+      }));
+
+      render(<CartSummary showClearButton={true} />);
+      
+      const clearButton = screen.getByRole('button', { name: /clear cart/i });
+      expect(clearButton).toHaveClass(
+        'px-3',
+        'py-1',
+        'text-sm',
+        'bg-red-500',
+        'text-white',
+        'rounded',
+        'hover:bg-red-600',
+        'transition-colors'
+      );
+    });
+
+    it('has proper accessibility attributes', () => {
+      mockUseCart.mockReturnValue(createMockCartContext({
+        getCartCount: jest.fn().mockReturnValue(2),
+      }));
+
+      render(<CartSummary showClearButton={true} />);
+      
+      const clearButton = screen.getByRole('button', { name: /clear cart/i });
+      expect(clearButton).toHaveAttribute('aria-label', 'Clear cart');
+    });
   });
 }); 
