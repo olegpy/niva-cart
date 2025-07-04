@@ -83,8 +83,23 @@ describe('ProductCard', () => {
         <ProductCard product={mockProduct} />
       </TestWrapper>
     );
-
     expect(screen.getByText('Available: 1 in stock')).toBeInTheDocument();
+  });
+
+  it('shows combined available and in cart info after adding to cart', () => {
+    render(
+      <TestWrapper>
+        <ProductCard product={mockProduct} />
+      </TestWrapper>
+    );
+    const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
+    fireEvent.click(addToCartButton);
+    expect(
+      screen.getByText(
+        (content, element) =>
+          element?.textContent === 'Available: 1 in stock | In cart: 1'
+      )
+    ).toBeInTheDocument();
   });
 
   it('adds product to cart when Add to Cart button is clicked', () => {
