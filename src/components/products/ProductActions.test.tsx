@@ -68,8 +68,13 @@ describe(ProductActions.name, () => {
       const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
       fireEvent.click(addToCartButton);
 
-      // Should show "In cart: 1"
-      expect(screen.getByText('In cart: 1')).toBeInTheDocument();
+      // Should show combined line (even if split across elements)
+      expect(
+        screen.getByText(
+          (content, element) =>
+            element?.textContent === 'Available: 5 in stock | In cart: 1'
+        )
+      ).toBeInTheDocument();
     });
 
     it('handles multiple clicks on Add to Cart button', () => {
@@ -80,14 +85,18 @@ describe(ProductActions.name, () => {
       );
 
       const addToCartButton = screen.getByRole('button', { name: /add to cart/i });
-      
       // Click multiple times
       fireEvent.click(addToCartButton);
       fireEvent.click(addToCartButton);
       fireEvent.click(addToCartButton);
 
-      // Should show updated quantity
-      expect(screen.getByText('In cart: 3')).toBeInTheDocument();
+      // Should show updated combined line (even if split across elements)
+      expect(
+        screen.getByText(
+          (content, element) =>
+            element?.textContent === 'Available: 5 in stock | In cart: 3'
+        )
+      ).toBeInTheDocument();
     });
 
     it('applies custom className', () => {

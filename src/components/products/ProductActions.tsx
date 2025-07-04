@@ -32,11 +32,12 @@ export default function ProductActions({
   if (variant === 'card') {
     return (
       <div className={className}>
-        {cartQuantity > 0 && (
-          <p className="text-sm text-blue-600 font-medium mb-2">
-            In cart: {cartQuantity}
-          </p>
-        )}
+        <p className="text-sm text-gray-500 mb-2">
+          Available: {product.quantity} in stock
+          {cartQuantity > 0 && (
+            <span className="text-blue-600 font-medium"> | In cart: {cartQuantity}</span>
+          )}
+        </p>
         <button
           onClick={handleAddToCart}
           className={`w-full py-2 px-4 rounded transition-colors ${
