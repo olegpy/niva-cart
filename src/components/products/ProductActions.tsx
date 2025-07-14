@@ -14,7 +14,7 @@ export default function ProductActions({
   variant = 'card',
   className = "" 
 }: ProductActionsProps) {
-  const { addToCart, getItemQuantity, incrementQuantity, decrementQuantity } = useCart();
+  const { addToCart, getItemQuantity, incrementQuantity, decrementQuantity, canAddToCart } = useCart();
   const cartQuantity = getItemQuantity(product.id);
 
   const handleAddToCart = () => {
@@ -41,11 +41,11 @@ export default function ProductActions({
         <button
           onClick={handleAddToCart}
           className={`w-full py-2 px-4 rounded transition-colors ${
-            product.quantity > 0
+            canAddToCart(product)
               ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
               : 'bg-gray-400 text-gray-600 cursor-not-allowed'
           }`}
-          disabled={product.quantity === 0}
+          disabled={!canAddToCart(product)}
         >
           {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
         </button>
@@ -82,7 +82,7 @@ export default function ProductActions({
             onClick={handleIncrement}
             className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
             aria-label="Increase quantity"
-            disabled={cartQuantity >= product.quantity}
+            disabled={!canAddToCart(product)}
           >
             +
           </button>
@@ -90,12 +90,12 @@ export default function ProductActions({
       ) : (
         <button
           className={`w-full py-3 px-6 rounded-lg transition-colors ${
-            product.quantity > 0
+            canAddToCart(product)
               ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
               : 'bg-gray-400 text-gray-600 cursor-not-allowed'
           }`}
           onClick={handleAddToCart}
-          disabled={product.quantity === 0}
+          disabled={!canAddToCart(product)}
         >
           {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
         </button>

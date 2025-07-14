@@ -114,9 +114,9 @@ describe('ProductCard', () => {
     // Click the Add to Cart button
     fireEvent.click(addToCartButton);
     
-    // The button should still be enabled and functional
-    expect(addToCartButton).toBeEnabled();
-    expect(addToCartButton).toHaveClass('bg-blue-600');
+    // The button should now be disabled because stock is 1
+    expect(addToCartButton).toBeDisabled();
+    expect(addToCartButton).toHaveClass('bg-gray-400');
   });
 
   it('handles multiple clicks on Add to Cart button', () => {
@@ -133,9 +133,9 @@ describe('ProductCard', () => {
     fireEvent.click(addToCartButton);
     fireEvent.click(addToCartButton);
     
-    // Button should remain functional
-    expect(addToCartButton).toBeEnabled();
-    expect(addToCartButton).toHaveClass('bg-blue-600');
+    // Button should be disabled after reaching stock limit
+    expect(addToCartButton).toBeDisabled();
+    expect(addToCartButton).toHaveClass('bg-gray-400');
   });
 
   it('renders out of stock product correctly', () => {

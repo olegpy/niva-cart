@@ -52,7 +52,7 @@ export default function Header() {
                   <h3 className="text-lg font-semibold mb-3">Cart Items</h3>
                   <div className="max-h-64 overflow-y-auto space-y-3">
                     {items.map((item) => (
-                      <CartItem key={item.id} item={item} compact={true} />
+                      <CartItem key={item.product.id} item={item} compact={true} />
                     ))}
                   </div>
                   <div className="mt-4 pt-3 border-t border-gray-200">

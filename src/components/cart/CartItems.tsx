@@ -20,7 +20,7 @@ export default function CartItems() {
             <div className="grid grid-cols-1 gap-6">
                 {items.map((item) => (
                     <CartItem
-                        key={item.id}
+                        key={item.product.id}
                         item={item}
                     />
                 ))}

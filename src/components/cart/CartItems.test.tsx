@@ -13,7 +13,7 @@ import { useCart } from '@/context/CartContext';
 const mockUseCart = useCart as jest.MockedFunction<typeof useCart>;
 
 // Helper function to create mock cart context
-const createMockCartContext = (items: Product[], total: number, count: number) => ({
+const createMockCartContext = (items: { product: Product; quantity: number }[], total: number, count: number) => ({
   items,
   addToCart: jest.fn(),
   removeFromCart: jest.fn(),
@@ -23,6 +23,7 @@ const createMockCartContext = (items: Product[], total: number, count: number) =
   getCartTotal: jest.fn().mockReturnValue(total),
   getCartCount: jest.fn().mockReturnValue(count),
   getItemQuantity: jest.fn().mockReturnValue(0),
+  canAddToCart: jest.fn(),
 });
 
 // Mock product data
@@ -47,6 +48,12 @@ const mockProducts: Product[] = [
   }
 ];
 
+// Mock cart items
+const mockCartItems = [
+  { product: mockProducts[0], quantity: 2 },
+  { product: mockProducts[1], quantity: 1 },
+];
+
 describe('CartItems', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -63,6 +70,7 @@ describe('CartItems', () => {
       getCartTotal: jest.fn().mockReturnValue(0),
       getCartCount: jest.fn().mockReturnValue(0),
       getItemQuantity: jest.fn().mockReturnValue(0),
+      canAddToCart: jest.fn(),
     });
 
     render(<CartItems />);
@@ -71,7 +79,7 @@ describe('CartItems', () => {
   });
 
   it('renders cart items when items exist', () => {
-    mockUseCart.mockReturnValue(createMockCartContext(mockProducts, 79.48, 3));
+    mockUseCart.mockReturnValue(createMockCartContext(mockCartItems, 79.48, 3));
 
     render(<CartItems />);
     
@@ -81,7 +89,7 @@ describe('CartItems', () => {
   });
 
   it('renders correct number of CartItem components', () => {
-    mockUseCart.mockReturnValue(createMockCartContext(mockProducts, 79.48, 3));
+    mockUseCart.mockReturnValue(createMockCartContext(mockCartItems, 79.48, 3));
 
     render(<CartItems />);
     
@@ -91,7 +99,7 @@ describe('CartItems', () => {
   });
 
   it('displays correct total price', () => {
-    mockUseCart.mockReturnValue(createMockCartContext(mockProducts, 79.48, 3));
+    mockUseCart.mockReturnValue(createMockCartContext(mockCartItems, 79.48, 3));
 
     render(<CartItems />);
     
@@ -99,7 +107,7 @@ describe('CartItems', () => {
   });
 
   it('displays total with decimal places', () => {
-    mockUseCart.mockReturnValue(createMockCartContext(mockProducts, 100.00, 3));
+    mockUseCart.mockReturnValue(createMockCartContext(mockCartItems, 100.00, 3));
 
     render(<CartItems />);
     
@@ -107,8 +115,8 @@ describe('CartItems', () => {
   });
 
   it('renders single item correctly', () => {
-    const singleProduct = [mockProducts[0]];
-    mockUseCart.mockReturnValue(createMockCartContext(singleProduct, 59.98, 2));
+    const singleCartItem = [mockCartItems[0]];
+    mockUseCart.mockReturnValue(createMockCartContext(singleCartItem, 59.98, 2));
 
     render(<CartItems />);
     
@@ -118,7 +126,7 @@ describe('CartItems', () => {
   });
 
   it('has correct styling classes for main container', () => {
-    mockUseCart.mockReturnValue(createMockCartContext(mockProducts, 79.48, 3));
+    mockUseCart.mockReturnValue(createMockCartContext(mockCartItems, 79.48, 3));
 
     render(<CartItems />);
     
@@ -127,7 +135,7 @@ describe('CartItems', () => {
   });
 
   it('has correct styling for items grid', () => {
-    mockUseCart.mockReturnValue(createMockCartContext(mockProducts, 79.48, 3));
+    mockUseCart.mockReturnValue(createMockCartContext(mockCartItems, 79.48, 3));
 
     render(<CartItems />);
     
@@ -137,7 +145,7 @@ describe('CartItems', () => {
   });
 
   it('has correct styling for total section', () => {
-    mockUseCart.mockReturnValue(createMockCartContext(mockProducts, 79.48, 3));
+    mockUseCart.mockReturnValue(createMockCartContext(mockCartItems, 79.48, 3));
 
     render(<CartItems />);
     
