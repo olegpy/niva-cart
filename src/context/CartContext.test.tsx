@@ -21,8 +21,8 @@ const TestComponent = () => {
       <div data-testid="cart-total">${getCartTotal().toFixed(2)}</div>
       <div data-testid="items-count">{items.length}</div>
       {items.map((item) => (
-        <div key={item.id} data-testid={`item-${item.id}`}>
-          {item.title} - Qty: {item.quantity}
+        <div key={item.product.id} data-testid={`item-${item.product.id}`}>
+          {item.product.title} - Qty: {item.quantity}
         </div>
       ))}
       <button 
