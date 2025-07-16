@@ -55,7 +55,7 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
       <div className="flex items-center gap-2">
         <button
           onClick={() => decrementQuantity(product.id)}
-          className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+          className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-colors cursor-pointer"
           aria-label="Decrease quantity"
         >
           -
@@ -63,7 +63,7 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
         <span className="w-8 text-center" data-testid="item-quantity">{quantity}</span>
         <button
           onClick={() => incrementQuantity(product.id)}
-          className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
+          className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-colors cursor-pointer"
           aria-label="Increase quantity"
           disabled={!canAddToCart(product)}
         >
