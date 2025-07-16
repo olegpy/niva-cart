@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Product } from "@/types";
 import { useCart } from "@/context/CartContext";
+import Link from "next/link";
 
 interface CartItemProps {
   item: {
@@ -40,18 +41,18 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
 
   return (
     <div className="flex items-center gap-4 bg-white p-4 rounded-lg shadow">
-      <div className="relative w-24 h-24">
+      <Link href={`/product/${product.id}`} className="relative w-24 h-24">
         <Image
           src={product.image}
           alt={product.title}
           fill
           className="object-contain"
         />
-      </div>
-      <div className="flex-grow">
+      </Link>
+      <Link href={`/product/${product.id}`} className="flex-grow">
         <h3 className="font-semibold">{product.title}</h3>
         <p className="text-gray-600">${product.price.toFixed(2)}</p>
-      </div>
+      </Link>
       <div className="flex items-center gap-2">
         <button
           onClick={() => decrementQuantity(product.id)}
@@ -63,7 +64,7 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
         <span className="w-8 text-center" data-testid="item-quantity">{quantity}</span>
         <button
           onClick={() => incrementQuantity(product.id)}
-          className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-colors cursor-pointer"
+          className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
           aria-label="Increase quantity"
           disabled={!canAddToCart(product)}
         >
