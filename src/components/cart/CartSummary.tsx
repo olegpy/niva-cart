@@ -28,7 +28,7 @@ export default function CartSummary({
       {showClearButton && getCartCount() > 0 && (
         <button
           onClick={clearCart}
-          className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+          className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors cursor-pointer"
           aria-label="Clear cart"
         >
           Clear Cart
