@@ -46,7 +46,7 @@ export default function Header() {
             {/* Cart Items Dropdown */}
             {showCartItems && items.length > 0 && (
               <div 
-                className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
+                className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 dark:text-gray-500"
               >
                 <div className="p-4">
                   <h3 className="text-lg font-semibold mb-3">Cart Items</h3>
