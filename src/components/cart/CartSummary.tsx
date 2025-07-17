@@ -18,7 +18,7 @@ export default function CartSummary({
   return (
     <div data-testid="cart-summary-container" className={`flex items-center gap-4 ${className}`}>
       {showItemCount && (
-        <span className="text-sm text-gray-600">
+        <span className={`text-sm text-gray-600 ${showClearButton && 'dark:text-gray-50'}`}>
           {getCartCount()} item{getCartCount() !== 1 ? 's' : ''}
         </span>
       )}

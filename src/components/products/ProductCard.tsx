@@ -23,9 +23,9 @@ export default function ProductCard({ product }: ProductCardProps) {
             className="object-contain"
           />
         </div>
-        <div className="p-4">
+        <div className="p-4 text-gray-600">
           <h3 className="text-lg font-semibold mb-2">{product.title}</h3>
-          <p className="text-gray-600">${product.price.toFixed(2)}</p>
+          <p>${product.price.toFixed(2)}</p>
         </div>
       </Link>
       <div className="p-4 pt-0 mt-auto flex flex-col justify-end">
