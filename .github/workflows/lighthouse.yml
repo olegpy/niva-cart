@@ -1,0 +1,66 @@
+name: Lighthouse Performance Check
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start production server
+        run: |
+          npm start &
+          echo "Server starting..."
+          sleep 20
+          echo "Checking if server is ready..."
+          curl -f http://localhost:3000 || exit 1
+          echo "Server is ready!"
+
+      - name: Run Lighthouse audit
+        run: |
+          echo "Running Lighthouse performance audit..."
+          npm run lighthouse:ci
+          echo "Lighthouse audit completed"
+
+      - name: Check performance scores
+        run: |
+          echo "Checking performance scores..."
+          npm run lighthouse:check
+          echo "Performance check completed successfully!"
+
+      - name: Upload Lighthouse report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: lighthouse-report.json
+          retention-days: 30
+
+      - name: Display Lighthouse results
+        run: |
+          echo "## 🎉 Lighthouse Performance Check Complete!"
+          echo "Check the Actions tab for detailed results and artifacts."
