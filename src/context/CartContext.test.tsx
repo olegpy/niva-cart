@@ -33,7 +33,7 @@ const TestComponent = () => {
           price: 29.99,
           description: 'Test product 1',
           category: 'electronics',
-          image: '/product1.jpg',
+          images: ['/product1.jpg'],
           quantity: 1
         })}
       >
@@ -47,7 +47,7 @@ const TestComponent = () => {
           price: 19.50,
           description: 'Test product 2',
           category: 'clothing',
-          image: '/product2.jpg',
+          images: ['/product2.jpg'],
           quantity: 1
         })}
       >

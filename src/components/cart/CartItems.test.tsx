@@ -34,7 +34,7 @@ const mockProducts: Product[] = [
     price: 29.99,
     description: 'First product description',
     category: 'electronics',
-    image: '/product1.jpg',
+    images: ['/product1.jpg'],
     quantity: 2
   },
   {
@@ -43,7 +43,7 @@ const mockProducts: Product[] = [
     price: 19.50,
     description: 'Second product description',
     category: 'clothing',
-    image: '/product2.jpg',
+    images: ['/product2.jpg'],
     quantity: 1
   }
 ];

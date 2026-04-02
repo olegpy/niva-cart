@@ -25,7 +25,7 @@ describe(Header.name, () => {
     price: 29.99,
     description: 'A test product',
     category: 'test',
-    image: '/test-image.jpg',
+    images: ['/test-image.jpg'],
     quantity: 1
   };
 

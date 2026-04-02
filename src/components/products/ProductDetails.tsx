@@ -15,7 +15,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
         {/* Product Image */}
         <div className="relative h-[500px] w-full">
           <Image
-            src={product.image}
+            src={product.images[0]}
             alt={product.title}
             fill
             priority

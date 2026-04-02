@@ -13,7 +13,7 @@ const mockProduct: Product = {
   title: 'Test Product',
   price: 99.99,
   description: 'Test Description',
-  image: '/test-image.jpg',
+  images: ['/test-image.jpg'],
   category: 'test-category',
   quantity: 5
 };
@@ -23,7 +23,7 @@ const mockOutOfStockProduct: Product = {
   title: 'Out of Stock Product',
   price: 49.99,
   description: 'Out of Stock Description',
-  image: '/out-of-stock-image.jpg',
+  images: ['/out-of-stock-image.jpg'],
   category: 'test-category',
   quantity: 0
 };
