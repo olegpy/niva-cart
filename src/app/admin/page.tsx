@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-
 type Product = {
     id: number;
     title: string;
     views: number;
-    purchases: number; 
+    purchases: number;
 }
 type AdminStats = {
   totalProducts: number;
@@ -16,34 +14,22 @@ type AdminStats = {
   topProducts: Product[];
 }
 
-export default function AdminDashboard() {
-  const [stats, setStats] = useState<AdminStats>({
-    totalProducts: 0,
-    totalRevenue: 0,
-    totalOrders: 0,
-    cartAbandonmentRate: 0,
-    topProducts: []
-  });
+const MOCK_STATS: AdminStats = {
+  totalProducts: 20,
+  totalRevenue: 15420.50,
+  totalOrders: 89,
+  cartAbandonmentRate: 68.5,
+  topProducts: [
+    { id: 1, title: "Fjallraven - Foldsack No. 1 Backpack", views: 245, purchases: 18 },
+    { id: 2, title: "Mens Casual Premium Slim Fit T-Shirts", views: 189, purchases: 15 },
+    { id: 3, title: "Mens Cotton Jacket", views: 156, purchases: 12 },
+    { id: 4, title: "Mens Casual Slim Fit", views: 134, purchases: 9 },
+    { id: 5, title: "John Hardy Women's Legends Naga Gold", views: 98, purchases: 7 }
+  ]
+};
 
-  // Load admin data with real analytics
-  useEffect(() => {
-    // Mock data for demonstration
-    const mockStats: AdminStats = {
-      totalProducts: 20,
-      totalRevenue: 15420.50,
-      totalOrders: 89,
-      cartAbandonmentRate: 68.5,
-      topProducts: [
-        { id: 1, title: "Fjallraven - Foldsack No. 1 Backpack", views: 245, purchases: 18 },
-        { id: 2, title: "Mens Casual Premium Slim Fit T-Shirts", views: 189, purchases: 15 },
-        { id: 3, title: "Mens Cotton Jacket", views: 156, purchases: 12 },
-        { id: 4, title: "Mens Casual Slim Fit", views: 134, purchases: 9 },
-        { id: 5, title: "John Hardy Women's Legends Naga Gold", views: 98, purchases: 7 }
-      ]
-    };
-    
-    setStats(mockStats);
-  }, []);
+export default function AdminDashboard() {
+  const stats = MOCK_STATS;
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -190,8 +176,8 @@ export default function AdminDashboard() {
                   <tr key={product.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {product.title.length > 50 
-                          ? `${product.title.substring(0, 50)}...` 
+                        {product.title.length > 50
+                          ? `${product.title.substring(0, 50)}...`
                           : product.title
                         }
                       </div>
@@ -223,7 +209,7 @@ export default function AdminDashboard() {
             <div className="ml-4">
               <h4 className="text-lg font-medium text-blue-900">Real-Time Features Coming Soon</h4>
               <p className="text-blue-700 mt-1">
-                This dashboard will soon include WebSocket integration for live user tracking, 
+                This dashboard will soon include WebSocket integration for live user tracking,
                 real-time cart monitoring, and instant notifications.
               </p>
             </div>
