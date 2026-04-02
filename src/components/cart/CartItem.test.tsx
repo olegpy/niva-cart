@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import CartItem from './CartItem';
 import { Product } from '@/types';
+import { mockCategory } from '@/test-utils/product';
 import { CartProvider, useCart } from '@/context/CartContext';
 
 // Mock product data
@@ -10,7 +11,7 @@ const mockProduct: Product = {
   title: 'Test Product',
   price: 29.99,
   description: 'A test product description',
-  category: 'electronics',
+  category: mockCategory('electronics'),
   images: ['/test-image.jpg'],
   quantity: 10 // Available stock
 };

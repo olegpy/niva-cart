@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import CartItems from './CartItems';
 import { Product } from '@/types';
+import { mockCategory } from '@/test-utils/product';
 
 // Mock the useCart hook
 jest.mock('@/context/CartContext', () => ({
@@ -33,7 +34,7 @@ const mockProducts: Product[] = [
     title: 'Product 1',
     price: 29.99,
     description: 'First product description',
-    category: 'electronics',
+    category: mockCategory('electronics'),
     images: ['/product1.jpg'],
     quantity: 2
   },
@@ -42,7 +43,7 @@ const mockProducts: Product[] = [
     title: 'Product 2',
     price: 19.50,
     description: 'Second product description',
-    category: 'clothing',
+    category: mockCategory('clothing'),
     images: ['/product2.jpg'],
     quantity: 1
   }

@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Header from './Header';
 import { CartProvider, useCart } from '@/context/CartContext';
 import { Product } from '@/types';
+import { mockCategory } from '@/test-utils/product';
 
 // Wrapper component for testing
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -24,7 +25,7 @@ describe(Header.name, () => {
     title: 'Test Product',
     price: 29.99,
     description: 'A test product',
-    category: 'test',
+    category: mockCategory('test'),
     images: ['/test-image.jpg'],
     quantity: 1
   };

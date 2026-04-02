@@ -33,7 +33,7 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
               ${product.price.toFixed(2)}
             </span>
             <span className="text-sm text-gray-500">
-              Category: {product.category}
+              Category: {product.category.name}
             </span>
           </div>
 

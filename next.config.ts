@@ -22,11 +22,27 @@ const nextConfig: NextConfig = {
         hostname: 'placehold.co',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.escuelajs.co',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'placeimg.com',
+        pathname: '/**',
+      },
     ],
     // Enable image optimization
     unoptimized: false,
     // Add domains for backward compatibility
-    domains: ['i.imgur.com', 'i.ytimg.com', 'placehold.co'],
+    domains: [
+      'i.imgur.com',
+      'i.ytimg.com',
+      'placehold.co',
+      'api.escuelajs.co',
+      'placeimg.com',
+    ],
     // Configure image sizes for better performance
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
