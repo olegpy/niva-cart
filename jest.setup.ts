@@ -5,8 +5,7 @@ import React from 'react';
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props: React.ImgHTMLAttributes<HTMLImageElement> & { fill?: boolean; priority?: boolean }) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { fill, priority, ...imgProps } = props;
+    const { fill: _fill, priority: _priority, ...imgProps } = props;
     return React.createElement('img', {
       ...imgProps,
       alt: props.alt || '',
