@@ -5,6 +5,29 @@ import { unstable_cache } from 'next/cache';
 // Type for the API response (without quantity)
 type ApiProduct = Omit<Product, 'quantity'>;
 
+/** placehold.co defaults to SVG; next/image rejects remote SVG optimization → 400. Raster URLs optimize fine. */
+const RASTER_IMAGE_EXT = /\.(png|jpe?g|gif|webp|avif)$/i;
+
+function normalizeImageUrlForOptimizer(url: string): string {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname !== 'placehold.co' || RASTER_IMAGE_EXT.test(parsed.pathname)) {
+      return url;
+    }
+    parsed.pathname = `${parsed.pathname}.png`;
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+}
+
+function withNormalizedImages(product: ApiProduct): ApiProduct {
+  return {
+    ...product,
+    images: product.images.map(normalizeImageUrlForOptimizer),
+  };
+}
+
 // Fetch all products
 // Create a memoized promise to ensure only one request is made
 let productsPromise: Promise<ApiProduct[]> | null = null;
@@ -23,8 +46,9 @@ export async function getProducts(): Promise<ApiProduct[]> {
       if (!response.ok) {
         throw new Error(`Error fetching products: ${response.status}`);
       }
-      return response.json();
-    });
+      return response.json() as Promise<ApiProduct[]>;
+    })
+    .then((data) => data.map(withNormalizedImages));
 
   return productsPromise;
 }
@@ -48,7 +72,8 @@ export const getProductDetails = unstable_cache(
       throw new Error(`Failed to fetch product: ${response.status} ${response.statusText}`);
     }
 
-    return response.json();
+    const product = (await response.json()) as ApiProduct;
+    return withNormalizedImages(product);
   },
   ['product-details'],
   { revalidate: 3600 } // Cache for 1 hour

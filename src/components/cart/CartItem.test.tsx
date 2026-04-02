@@ -11,7 +11,7 @@ const mockProduct: Product = {
   price: 29.99,
   description: 'A test product description',
   category: 'electronics',
-  image: '/test-image.jpg',
+  images: ['/test-image.jpg'],
   quantity: 10 // Available stock
 };
 

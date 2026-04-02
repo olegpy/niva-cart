@@ -13,7 +13,7 @@ const mockProduct: Product = {
   title: 'Test Product',
   price: 99.99,
   description: 'Test Description',
-  image: '/test-image.jpg',
+  images: ['/test-image.jpg'],
   category: 'test-category',
   quantity: 10
 };

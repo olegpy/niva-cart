@@ -15,7 +15,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/product/${product.id}`} className="flex-1 flex flex-col">
         <div className="relative h-48 w-full">
           <Image
-            src={product.image}
+            src={product.images[0]}
             alt={product.title}
             fill
             priority
