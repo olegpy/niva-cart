@@ -1,7 +1,8 @@
 # Niva Cart
 
 ## Project Overview
-A modern e-commerce application built with Next.js 15, showcasing frontend development practices and real-world implementation of e-commerce features. This project demonstrates expertise in building scalable, performant web applications with a focus on user experience and code quality.
+
+Small storefront built with Next.js (App Router): product listing, product detail, and a client-side cart. Unit tests use Jest; browser flows use Playwright.
 
 ## Technical Stack
 - **Frontend Framework**: Next.js 15 with App Router
@@ -95,23 +96,24 @@ npm run lighthouse:full
 
 ## End-to-end tests (Playwright)
 
-Specs are in `e2e/`. They hit the real Next app (catalog, cart, etc.).
+Tests are under `e2e/`. They open the real UI (home, cart, etc.) in a browser.
 
-The product list and detail pages fetch data during SSR. That happens on the server, not in the browser, so Playwright can’t fake the API with `page.route` alone. Instead, `playwright.config.ts` runs `e2e/run-dev-with-mock.mjs` before tests: it brings up `mock-api-server.mjs` (serves `fixtures/mock-products.json` on `/api/v1/...`) and `npm run dev` on port 3100 with `NEXT_PUBLIC_API_BASE_URL` aimed at that server. You don’t need to start the mock yourself for `npm run test:e2e`.
+Products are fetched during SSR, so stubbing the API only in the browser isn’t enough. When you run `npm run test:e2e`, Playwright starts `e2e/run-dev-with-mock.mjs`: a small mock serves `e2e/fixtures/mock-products.json` at `/products` and `/products/:id`, and Next dev listens on port 3100 with `NEXT_PUBLIC_API_BASE_URL` pointed at that mock. You normally don’t start the mock yourself.
+
+Ports 4000 (mock) and 3100 (app) are the defaults. If something else is bound there, use `npm run test:e2e:alt` (uses 4001 and 3110), or set `MOCK_API_PORT` / `E2E_APP_PORT` — `playwright.config.ts` forwards them to `run-dev-with-mock.mjs`.
+
+If E2E fails with “another dev server is already running,” stop your regular `npm run dev` first; Next 16 expects a single `next dev` per repo. If Playwright says the browser is missing, run `npm run test:e2e:install` once (or after upgrading `@playwright/test`).
+
+CI runs this via `.github/workflows/playwright.yml` with `playwright install --with-deps`. Jest does not run files in `e2e/`, so `npm test` stays unit-only.
 
 ```bash
-npm run test:e2e              # headless, usual run
-npm run test:e2e:ui           # interactive runner
-npm run test:e2e:headed       # watch the browser
-npm run test:e2e:install      # download Chromium (first clone or after bumping @playwright/test)
-npm run test:e2e:install:ci   # Chromium + OS deps; GitHub Actions uses the same idea
+npm run test:e2e              # headless
+npm run test:e2e:alt          # alternate ports if 3100/4000 are taken
+npm run test:e2e:ui           # UI mode
+npm run test:e2e:headed
+npm run test:e2e:install      # Chromium (local)
+npm run test:e2e:install:ci     # Chromium + OS deps (closer to CI)
 ```
-
-If Playwright complains the browser binary is missing, run `test:e2e:install` once.
-
-CI: `.github/workflows/playwright.yml` runs `npx playwright test` after installing browsers with `--with-deps`.
-
-Jest ignores `e2e/`, so `npm test` won’t try to execute Playwright files.
 
 ## Performance Testing with Lighthouse
 

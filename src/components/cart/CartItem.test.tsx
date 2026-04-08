@@ -13,6 +13,7 @@ const mockProduct: Product = {
   description: 'A test product description',
   category: mockCategory('electronics'),
   images: ['/test-image.jpg'],
+  thumbnail: '/test-image.jpg',
   quantity: 10 // Available stock
 };
 

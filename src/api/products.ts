@@ -1,34 +1,63 @@
 import { Product } from '@/types';
 import { API_BASE_URL } from '@/config/env';
 import { unstable_cache } from 'next/cache';
-import { normalizeProductImagesFromApi } from '@/lib/productImageUrls';
+import { PRODUCT_IMAGE_PLACEHOLDER } from '@/lib/productImage';
 
 type ApiProduct = Omit<Product, 'quantity'>;
 
+type ProductsEnvelope = { products: ApiProduct[] };
+
+/** Public fallback when API omits or empties image URLs (avoids Next/Image `src=""` warnings). */
+const PLACEHOLDER_IMAGE = PRODUCT_IMAGE_PLACEHOLDER;
+
+function listFromProductsJson(data: ProductsEnvelope | ApiProduct[]): ApiProduct[] {
+    if (Array.isArray(data)) {
+        return data;
+    }
+    if (
+        data !== null &&
+        typeof data === 'object' &&
+        'products' in data &&
+        Array.isArray((data as ProductsEnvelope).products)
+    ) {
+        return (data as ProductsEnvelope).products;
+    }
+    throw new Error(
+        'Products API returned an unexpected JSON shape (expected an array or { products: [] })'
+    );
+}
+
 function normalizeApiProduct(product: ApiProduct): ApiProduct {
+  const rawImages = Array.isArray(product.images) ? product.images : [];
+  const images = rawImages.map((u) => (typeof u === 'string' ? u.trim() : '')).filter(Boolean);
+  const thumb =
+    (typeof product.thumbnail === 'string' && product.thumbnail.trim()) ||
+    images[0] ||
+    PLACEHOLDER_IMAGE;
+  const imagesOut = images.length > 0 ? images : [thumb];
   return {
     ...product,
-    images: normalizeProductImagesFromApi(product.images),
+    images: imagesOut,
+    thumbnail: thumb,
   };
 }
 
 let productsPromise: Promise<ApiProduct[]> | null = null;
 
 export async function getProducts(): Promise<ApiProduct[]> {
-  if (productsPromise) {
+    if (productsPromise) {
+        return productsPromise;
+    }
+    productsPromise = fetch(`${API_BASE_URL}/products`, { cache: 'force-cache' }).then(
+        async (response) => {
+            if (!response.ok) {
+                throw new Error(`Error fetching products: ${response.status}`);
+            }
+            const data: unknown = await response.json();
+            return listFromProductsJson(data as ProductsEnvelope).map(normalizeApiProduct);
+        }
+    );
     return productsPromise;
-  }
-
-  productsPromise = fetch(`${API_BASE_URL}/products`, { cache: 'force-cache' })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Error fetching products: ${response.status}`);
-      }
-      return response.json() as Promise<ApiProduct[]>;
-    })
-    .then((data) => data.map(normalizeApiProduct));
-
-  return productsPromise;
 }
 
 export const getProductDetails = unstable_cache(

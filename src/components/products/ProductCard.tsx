@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Product } from '@/types';
+import { productImageSrc } from '@/lib/productImage';
 import ProductActions from './ProductActions';
 
 interface ProductCardProps {
@@ -15,7 +16,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/product/${product.id}`} className="flex-1 flex flex-col">
         <div className="relative h-48 w-full">
           <Image
-            src={product.images[0]}
+            src={productImageSrc(product)}
             alt={product.title}
             fill
             priority

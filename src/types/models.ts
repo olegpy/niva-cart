@@ -15,4 +15,5 @@ export interface Product {
   images: string[];
   category: ProductCategory;
   quantity: number;
+  thumbnail: string;
 }

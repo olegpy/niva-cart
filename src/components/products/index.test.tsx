@@ -16,6 +16,7 @@ const mockProducts: Product[] = [
     price: 10.99,
     description: 'Test Description 1',
     images: ['/test-image-1.jpg'],
+    thumbnail: '/test-image-1.jpg',
     category: mockCategory('test-category'),
     quantity: 1
   },
@@ -25,6 +26,7 @@ const mockProducts: Product[] = [
     price: 20.99,
     description: 'Test Description 2',
     images: ['/test-image-2.jpg'],
+    thumbnail: '/test-image-2.jpg',
     category: mockCategory('test-category'),
     quantity: 1
   }

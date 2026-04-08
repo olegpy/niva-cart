@@ -1,32 +1,40 @@
-[
-  {
-    "id": 101,
-    "title": "E2E Alpha Item",
-    "price": 10,
-    "description": "Mock product A for Playwright",
-    "images": ["https://placehold.co/200x200.png"],
-    "category": {
-      "id": 1,
-      "name": "Electronics",
-      "slug": "electronics",
-      "image": "https://placehold.co/64x64.png",
-      "creationAt": "2020-01-01T00:00:00.000Z",
-      "updatedAt": "2020-01-01T00:00:00.000Z"
+{
+  "products": [
+    {
+      "id": 101,
+      "title": "E2E Alpha Item",
+      "price": 10,
+      "description": "Mock product A for Playwright",
+      "images": [
+        "https://placehold.co/200x200.png"
+      ],
+      "thumbnail": "https://placehold.co/200x200.png",
+      "category": {
+        "id": 1,
+        "name": "Electronics",
+        "slug": "electronics",
+        "image": "https://placehold.co/64x64.png",
+        "creationAt": "2020-01-01T00:00:00.000Z",
+        "updatedAt": "2020-01-01T00:00:00.000Z"
+      }
+    },
+    {
+      "id": 102,
+      "title": "E2E Beta Item",
+      "price": 25.5,
+      "description": "Mock product B for Playwright",
+      "images": [
+        "https://placehold.co/200x200.png"
+      ],
+      "thumbnail": "https://placehold.co/200x200.png",
+      "category": {
+        "id": 2,
+        "name": "Books",
+        "slug": "books",
+        "image": "https://placehold.co/64x64.png",
+        "creationAt": "2020-01-01T00:00:00.000Z",
+        "updatedAt": "2020-01-01T00:00:00.000Z"
+      }
     }
-  },
-  {
-    "id": 102,
-    "title": "E2E Beta Item",
-    "price": 25.5,
-    "description": "Mock product B for Playwright",
-    "images": ["https://placehold.co/200x200.png"],
-    "category": {
-      "id": 2,
-      "name": "Books",
-      "slug": "books",
-      "image": "https://placehold.co/64x64.png",
-      "creationAt": "2020-01-01T00:00:00.000Z",
-      "updatedAt": "2020-01-01T00:00:00.000Z"
-    }
-  }
-]
+  ]
+}

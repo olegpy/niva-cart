@@ -35,6 +35,7 @@ const TestComponent = () => {
           description: 'Test product 1',
           category: mockCategory('electronics'),
           images: ['/product1.jpg'],
+          thumbnail: '/product1.jpg',
           quantity: 1
         })}
       >
@@ -49,6 +50,7 @@ const TestComponent = () => {
           description: 'Test product 2',
           category: mockCategory('clothing'),
           images: ['/product2.jpg'],
+          thumbnail: '/product2.jpg',
           quantity: 1
         })}
       >

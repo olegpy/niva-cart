@@ -15,6 +15,7 @@ const mockProduct: Product = {
   price: 99.99,
   description: 'Test Description',
   images: ['/test-image.jpg'],
+  thumbnail: '/test-image.jpg',
   category: mockCategory('test-category'),
   quantity: 1
 };
@@ -25,6 +26,7 @@ const mockOutOfStockProduct: Product = {
   price: 49.99,
   description: 'Out of Stock Description',
   images: ['/out-of-stock-image.jpg'],
+  thumbnail: '/out-of-stock-image.jpg',
   category: mockCategory('test-category'),
   quantity: 0
 };
