@@ -25,6 +25,7 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
             src={product.images[0]}
             alt={product.title}
             fill
+            sizes="48px"
             className="object-contain"
           />
         </div>
@@ -46,6 +47,7 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
           src={product.images[0]}
           alt={product.title}
           fill
+          sizes="(max-width: 640px) 100vw, 96px"
           className="object-contain"
         />
       </Link>
