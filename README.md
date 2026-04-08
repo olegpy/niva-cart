@@ -11,7 +11,7 @@ A modern e-commerce application built with Next.js 15, showcasing frontend devel
 - **API Integration**: RESTful API consumption
 - **Deployment**: Vercel with CI/CD pipeline
 - **Version Control**: Git with GitHub
-- **Testing**: Jest and React Testing Library
+- **Testing**: Jest and React Testing Library (unit), Playwright (end-to-end)
 - **Code Quality**: ESLint, Prettier
 - **Performance**: Implemented image optimization, lazy loading, and code splitting
 - **Performance Testing**: Lighthouse CI with 95%+ score requirements
@@ -83,12 +83,35 @@ npm run dev
 # Build for production
 npm run build
 
-# Run tests
+# Run unit tests
 npm test
+
+# E2E tests (Playwright starts the app + mock API; see below)
+npm run test:e2e
 
 # Run Lighthouse performance check
 npm run lighthouse:full
 ```
+
+## End-to-end tests (Playwright)
+
+Specs are in `e2e/`. They hit the real Next app (catalog, cart, etc.).
+
+The product list and detail pages fetch data during SSR. That happens on the server, not in the browser, so Playwright can’t fake the API with `page.route` alone. Instead, `playwright.config.ts` runs `e2e/run-dev-with-mock.mjs` before tests: it brings up `mock-api-server.mjs` (serves `fixtures/mock-products.json` on `/api/v1/...`) and `npm run dev` on port 3100 with `NEXT_PUBLIC_API_BASE_URL` aimed at that server. You don’t need to start the mock yourself for `npm run test:e2e`.
+
+```bash
+npm run test:e2e              # headless, usual run
+npm run test:e2e:ui           # interactive runner
+npm run test:e2e:headed       # watch the browser
+npm run test:e2e:install      # download Chromium (first clone or after bumping @playwright/test)
+npm run test:e2e:install:ci   # Chromium + OS deps; GitHub Actions uses the same idea
+```
+
+If Playwright complains the browser binary is missing, run `test:e2e:install` once.
+
+CI: `.github/workflows/playwright.yml` runs `npx playwright test` after installing browsers with `--with-deps`.
+
+Jest ignores `e2e/`, so `npm test` won’t try to execute Playwright files.
 
 ## Performance Testing with Lighthouse
 
