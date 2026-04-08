@@ -1,14 +1,17 @@
 import { spawn } from 'node:child_process';
 import { startMockApiServer } from './fixtures/mock-api-server.mjs';
 
-const api = await startMockApiServer({ port: 4000 });
+const mockApiPort = Number(process.env.MOCK_API_PORT || 4000);
+const api = await startMockApiServer({ port: mockApiPort });
 const appPort = Number(process.env.PORT || 3100);
 
+// Do not inherit stdin: under Playwright's webServer (and `test --ui`) stdin is often closed;
+// `next dev` can then see EOF and exit immediately with code 0 ("Process from config.webServer exited early").
 const child = spawn(
   process.platform === 'win32' ? 'npm.cmd' : 'npm',
   ['run', 'dev', '--', '-p', String(appPort)],
   {
-    stdio: 'inherit',
+    stdio: ['ignore', 'inherit', 'inherit'],
     env: {
       ...process.env,
       PORT: String(appPort),

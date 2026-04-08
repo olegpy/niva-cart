@@ -36,6 +36,7 @@ const mockProducts: Product[] = [
     description: 'First product description',
     category: mockCategory('electronics'),
     images: ['/product1.jpg'],
+    thumbnail: '/product1.jpg',
     quantity: 2
   },
   {
@@ -45,6 +46,7 @@ const mockProducts: Product[] = [
     description: 'Second product description',
     category: mockCategory('clothing'),
     images: ['/product2.jpg'],
+    thumbnail: '/product2.jpg',
     quantity: 1
   }
 ];

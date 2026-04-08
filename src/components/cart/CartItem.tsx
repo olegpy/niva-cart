@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Product } from "@/types";
+import { productImageSrc } from "@/lib/productImage";
 import { useCart } from "@/context/CartContext";
 import Link from "next/link";
 
@@ -22,7 +23,7 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
       <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg dark:bg-gray-200">
         <div className="relative w-12 h-12 flex-shrink-0">
           <Image
-            src={product.images[0]}
+            src={productImageSrc(product)}
             alt={product.title}
             fill
             sizes="48px"
@@ -44,7 +45,7 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
     <div className="flex items-center gap-4 bg-white p-4 rounded-lg shadow dark:text-gray-600 sm:flex-nowrap flex-wrap ">
       <Link href={`/product/${product.id}`} className="relative sm:w-24 h-24 w-full">
         <Image
-          src={product.images[0]}
+          src={productImageSrc(product)}
           alt={product.title}
           fill
           sizes="(max-width: 640px) 100vw, 96px"

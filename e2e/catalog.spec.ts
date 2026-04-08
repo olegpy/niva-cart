@@ -1,7 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
 
-import mockProducts from './fixtures/mock-products.json';
+import mockData from './fixtures/mock-products.json';
 import { headerCartLink } from './helpers';
+
+const mockProducts = mockData.products;
 
 function productCard(page: Page, title: string) {
   return page

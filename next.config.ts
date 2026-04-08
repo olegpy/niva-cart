@@ -10,37 +10,12 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'i.imgur.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'i.ytimg.com',
+        hostname: 'cdn.dummyjson.com',
         pathname: '/**',
       },
       {
         protocol: 'https',
         hostname: 'placehold.co',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'api.escuelajs.co',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'placeimg.com',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'cdsassets.apple.com',
         pathname: '/**',
       },
     ],

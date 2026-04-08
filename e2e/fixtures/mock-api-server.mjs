@@ -15,7 +15,8 @@ function json(res, status, body) {
 
 export async function startMockApiServer({ port = 4000 } = {}) {
   const raw = await readFile(FIXTURE_PATH, 'utf8');
-  const products = JSON.parse(raw);
+  const parsed = JSON.parse(raw);
+  const list = Array.isArray(parsed) ? parsed : parsed.products;
 
   const server = http.createServer((req, res) => {
     const url = new URL(req.url ?? '/', `http://${req.headers.host ?? '127.0.0.1'}`);
@@ -27,15 +28,15 @@ export async function startMockApiServer({ port = 4000 } = {}) {
       return;
     }
 
-    if (pathname === '/api/v1/products') {
-      json(res, 200, products);
+    if (pathname === '/products') {
+      json(res, 200, { products: list });
       return;
     }
 
-    const detail = /^\/api\/v1\/products\/(\d+)$/.exec(pathname);
+    const detail = /^\/products\/(\d+)$/.exec(pathname);
     if (detail) {
       const id = Number(detail[1]);
-      const row = products.find((p) => p.id === id);
+      const row = list.find((p) => p.id === id);
       if (!row) {
         json(res, 404, {});
         return;

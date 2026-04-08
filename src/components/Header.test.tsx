@@ -27,6 +27,7 @@ describe(Header.name, () => {
     description: 'A test product',
     category: mockCategory('test'),
     images: ['/test-image.jpg'],
+    thumbnail: '/test-image.jpg',
     quantity: 1
   };
 

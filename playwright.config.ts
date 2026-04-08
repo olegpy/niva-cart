@@ -11,6 +11,10 @@ import { defineConfig, devices } from '@playwright/test';
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+const e2eAppPort = process.env.E2E_APP_PORT || '3100';
+const mockApiPort = process.env.MOCK_API_PORT || '4000';
+const e2eBaseURL = `http://127.0.0.1:${e2eAppPort}`;
+
 export default defineConfig({
   testDir: './e2e',
   /* Run tests in files in parallel */
@@ -24,7 +28,7 @@ export default defineConfig({
   reporter: process.env.CI ? 'github' : 'list',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    baseURL: 'http://127.0.0.1:3100',
+    baseURL: e2eBaseURL,
     trace: 'on-first-retry',
   },
 
@@ -37,7 +41,12 @@ export default defineConfig({
 
   webServer: {
     command: 'node e2e/run-dev-with-mock.mjs',
-    url: 'http://127.0.0.1:3100',
+    url: e2eBaseURL,
+    env: {
+      ...process.env,
+      PORT: e2eAppPort,
+      MOCK_API_PORT: mockApiPort,
+    },
     reuseExistingServer: false,
     timeout: 120_000,
   },
