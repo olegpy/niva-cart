@@ -11,19 +11,24 @@ import { useCart } from '@/context/CartContext';
 
 const mockUseCart = useCart as jest.MockedFunction<typeof useCart>;
 
-// Helper function to create a complete mock cart context
-const createMockCartContext = (overrides: Partial<ReturnType<typeof useCart>> = {}) => ({
-  items: [],
-  addToCart: jest.fn(),
-  removeFromCart: jest.fn(),
-  incrementQuantity: jest.fn(),
-  decrementQuantity: jest.fn(),
-  clearCart: jest.fn(),
-  getCartTotal: jest.fn().mockReturnValue(29.99),
-  getCartCount: jest.fn().mockReturnValue(2),
-  getItemQuantity: jest.fn(),
-  ...overrides,
-});
+type CartValue = ReturnType<typeof useCart>;
+
+/** Defaults for `useCart()`; pass overrides for a specific test. */
+function createMockCartContext(overrides: Partial<CartValue> = {}): CartValue {
+  return {
+    items: [],
+    addToCart: jest.fn(),
+    removeFromCart: jest.fn(),
+    incrementQuantity: jest.fn(),
+    decrementQuantity: jest.fn(),
+    clearCart: jest.fn(),
+    getCartTotal: jest.fn().mockReturnValue(29.99),
+    getCartCount: jest.fn().mockReturnValue(2),
+    getItemQuantity: jest.fn(),
+    canAddToCart: jest.fn().mockReturnValue(true),
+    ...overrides,
+  };
+}
 
 describe('CartSummary', () => {
   beforeEach(() => {
