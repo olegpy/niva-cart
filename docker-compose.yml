@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: niva-cart-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: niva
+      POSTGRES_PASSWORD: niva
+      POSTGRES_DB: niva_cart
+    volumes:
+      - niva_cart_pg_data:/var/lib/postgresql/data
+
+volumes:
+  niva_cart_pg_data:
