@@ -1,5 +1,3 @@
-'use client';
-
 type Product = {
     id: number;
     title: string;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import AdminNav from "@/components/admin/AdminNav";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Niva Cart",
@@ -44,6 +45,8 @@ export default function AdminLayout({
           </div>
         </div>
       </header>
+
+      <AdminNav />
 
       {/* Admin Content */}
       <main className="min-h-screen bg-gray-50">
