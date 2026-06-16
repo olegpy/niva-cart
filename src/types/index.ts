@@ -1,3 +1,4 @@
 // Re-export core types
 export * from './models';
-export * from './api'; 
+export * from './api';
+export * from './user';
