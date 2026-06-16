@@ -2,13 +2,17 @@ name: Playwright Tests
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
+
+env:
+  # Keep in sync with @playwright/test in package.json when upgrading Playwright.
+  PLAYWRIGHT_IMAGE: mcr.microsoft.com/playwright:v1.59.1-noble
 
 jobs:
   test:
-    timeout-minutes: 60
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,14 +22,34 @@ jobs:
           node-version: "24"
           cache: "npm"
 
+      - name: Cache Playwright Docker image
+        uses: actions/cache@v4
+        with:
+          path: playwright-image.tar
+          key: playwright-docker-v1.59.1-noble
+
+      - name: Load or pull Playwright Docker image
+        run: |
+          if [ -f playwright-image.tar ]; then
+            echo "Loading Playwright image from cache..."
+            docker load -i playwright-image.tar
+          else
+            echo "Pulling Playwright image (first run — will cache for next time)..."
+            docker pull "$PLAYWRIGHT_IMAGE"
+            docker save "$PLAYWRIGHT_IMAGE" -o playwright-image.tar
+          fi
+
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
-
       - name: Run Playwright tests
-        run: npx playwright test
+        run: |
+          docker run --rm --init --ipc=host \
+            -v "${{ github.workspace }}:/app" \
+            -w /app \
+            -e CI=true \
+            "$PLAYWRIGHT_IMAGE" \
+            npm run test:e2e
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
