@@ -1,5 +1,5 @@
 import type { PrismaClient } from '@prisma/client';
-import { UserRole } from '../../src/types/user';
+import { UserRole } from '../../src/features/admin/users/types';
 
 const users = [
   {
