@@ -1,5 +1,5 @@
-import Header from "@/components/Header";
-import { CartProvider } from "@/context/CartContext";
+import Header from "@/shared/components/Header";
+import { CartProvider } from "@/features/cart/context/CartContext";
 
 export default function MainLayout({
   children,

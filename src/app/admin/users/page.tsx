@@ -1,6 +1,6 @@
-import UsersList from '@/components/admin/UsersList';
-import { getUsers } from '@/api/users';
-import type { User } from '@/types/user';
+import UsersList from '@/features/admin/users/components/UsersList';
+import { getUsers } from '@/features/admin/users/api/users';
+import type { User } from '@/features/admin/users/types';
 
 export const dynamic = 'force-dynamic';
 

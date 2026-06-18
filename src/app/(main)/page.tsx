@@ -1,5 +1,5 @@
-import Products from "@/components/products";
-import { DEFAULT_PRODUCT_QUANTITY, getProducts } from "@/api/products";
+import Products from "@/features/products/components";
+import { DEFAULT_PRODUCT_QUANTITY, getProducts } from "@/features/products/api/products";
 
 export default async function Home() {
   const products = await getProducts();

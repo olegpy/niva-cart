@@ -1,4 +1,4 @@
-import CartItems from "@/components/cart/CartItems";
+import CartItems from "@/features/cart/components/CartItems";
 
 export default function CartPage() {
     return (

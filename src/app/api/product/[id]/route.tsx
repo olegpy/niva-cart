@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProduct } from '@/api/products';
-import { ProductResponse } from '@/types/api';
+import { getProduct } from '@/features/products/api/products';
+import { ProductResponse } from '@/features/products/api/types';
 
 export async function GET(
   request: NextRequest,

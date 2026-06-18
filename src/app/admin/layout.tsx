@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import AdminNav from "@/components/admin/AdminNav";
+import AdminNav from "@/features/admin/components/AdminNav";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Niva Cart",
