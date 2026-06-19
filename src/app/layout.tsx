@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import AuthProvider from "@/features/admin/auth/components/AuthProvider";
 
 export const metadata: Metadata = {
   title: "Niva Cart | E-commerce Store",
@@ -13,7 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">{children}</body>
+        <body className="font-sans antialiased">
+          <AuthProvider>{children}</AuthProvider>
+        </body>
     </html>
   );
 }
