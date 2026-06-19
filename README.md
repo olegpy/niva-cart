@@ -185,6 +185,82 @@ The project uses GitHub Actions for CI/CD and deploys to Vercel. Required secret
 
 For detailed setup instructions, refer to the [Vercel Deployment Documentation](https://vercel.com/docs).
 
+## Admin authentication
+
+Admin login uses **next-auth v4** with **Credentials** (email + password). Only users with `role: admin` and a `passwordHash` in the database can sign in. Customer accounts have no password.
+
+### Demo admin login
+
+This project is a demo — the seeded admin credentials are intentional:
+
+| | |
+|---|---|
+| **URL** | `/admin/login` |
+| **Email** | `admin@niva-cart.local` |
+| **Password** | `admin123` |
+
+Works after `npm run db:seed` (local, preview, or prod). Same seed on every environment.
+
+### Local setup
+
+Add to `.env` (see `.env.example`):
+
+```bash
+DATABASE_URL=postgresql://niva:niva@localhost:5432/niva_cart
+NEXTAUTH_SECRET=...          # openssl rand -base64 32
+NEXTAUTH_URL=http://localhost:3000
+```
+
+Seed the dev admin user:
+
+```bash
+npm run db:seed
+```
+
+See **Demo admin login** above for credentials.
+
+### Vercel environment variables
+
+| Variable | Production | Preview | Notes |
+|----------|------------|---------|-------|
+| `NEXTAUTH_SECRET` | ✅ | ✅ | Required. Same name exactly — not `NEXT_AUTH_SECRET`. |
+| `NEXTAUTH_URL` | ✅ | ❌ | Production: `https://your-prod-domain.vercel.app`. Preview uses `VERCEL_URL` automatically. |
+| `DATABASE_URL` | ✅ | ✅ | See Supabase notes below. |
+
+After adding or changing env vars, **redeploy** — existing deployments do not pick up new values.
+
+### Supabase `DATABASE_URL` — add `pgbouncer=true`
+
+On Vercel, append this to your Supabase `DATABASE_URL` (default port `5432`):
+
+```
+?pgbouncer=true
+```
+
+Example:
+
+```
+postgresql://postgres.[ref]:[password]@aws-0-[region].supabase.co:5432/postgres?pgbouncer=true
+```
+
+Without it, Prisma may fail with `prepared statement "s0" already exists`.
+
+Run migrations and seed from your machine (do not commit prod URLs):
+
+```bash
+DATABASE_URL="postgresql://...:5432/postgres" npm run db:deploy
+DATABASE_URL="postgresql://...:5432/postgres" npm run db:seed
+```
+
+### Routes
+
+| URL | Access |
+|-----|--------|
+| `/admin/login` | Public |
+| `/admin`, `/admin/users`, etc. | Admin session required (`proxy.ts`) |
+
+Logout is in the admin dashboard header. Login uses a separate layout under `src/app/admin/(auth)/`.
+
 
 ## Contributing
 Feel free to submit issues and enhancement requests!
