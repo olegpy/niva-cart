@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AdminNav from "@/features/admin/components/AdminNav";
+import LogoutButton from "@/features/admin/auth/components/LogoutButton";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Niva Cart",
@@ -29,18 +30,19 @@ export default function AdminLayout({
                 <p className="text-sm text-gray-600">Niva Cart Management</p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                 <span>Live</span>
               </div>
-              <Link 
-                href="/" 
+              <Link
+                href="/"
                 className="text-sm text-gray-900 font-medium"
               >
                 ← Back to Store
               </Link>
+              <LogoutButton />
             </div>
           </div>
         </div>
@@ -55,4 +57,3 @@ export default function AdminLayout({
     </>
   );
 }
-
