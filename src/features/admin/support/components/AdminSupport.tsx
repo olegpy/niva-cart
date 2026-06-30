@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { MOCK_SUPPORT_THREADS } from '@/features/admin/support/components/mockSupportData';
 import type { SupportMessage } from '@/features/admin/support/types';
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib/cn';
 
 function formatTime(iso: string): string {

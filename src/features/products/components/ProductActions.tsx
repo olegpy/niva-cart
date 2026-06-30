@@ -2,7 +2,7 @@
 
 import { Product } from '@/features/products/types';
 import { useCart } from "@/features/cart/context/CartContext";
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib/cn';
 
 interface ProductActionsProps {

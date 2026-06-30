@@ -2,10 +2,13 @@
 
 import { useActionState, useId } from "react";
 import { loginAction, type LoginState } from "../actions/login";
-import { Alert } from "@/shared/components/ui/alert";
-import { Button, formButtonClassName } from "@/shared/components/ui/button";
-import { FormField } from "@/shared/components/ui/form-field";
-import { Input } from "@/shared/components/ui/input";
+import {
+  Alert,
+  Button,
+  FormField,
+  Input,
+  formButtonClassName,
+} from "@/shared/components/ui";
 
 const initialState: LoginState = {};
 
