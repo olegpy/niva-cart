@@ -1,6 +1,7 @@
 'use client';
 
 import { useCart } from "@/features/cart/context/CartContext";
+import { Button } from '@/shared/components/ui/button';
 
 interface CartSummaryProps {
   showItemCount?: boolean;
@@ -26,14 +27,16 @@ export default function CartSummary({
         Total: ${getCartTotal().toFixed(2)}
       </span>
       {showClearButton && getCartCount() > 0 && (
-        <button
+        <Button
+          type="button"
+          variant="destructive"
+          size="sm"
           onClick={clearCart}
-          className="px-3 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors cursor-pointer"
           aria-label="Clear cart"
         >
           Clear Cart
-        </button>
+        </Button>
       )}
     </div>
   );
-} 
+}

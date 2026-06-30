@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { MOCK_SUPPORT_THREADS } from '@/features/admin/support/components/mockSupportData';
 import type { SupportMessage } from '@/features/admin/support/types';
+import { Button } from '@/shared/components/ui/button';
+import { cn } from '@/shared/lib/cn';
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleString(undefined, {
@@ -40,13 +42,16 @@ export default function AdminSupport() {
                 const preview = lastMessage?.text ?? 'No messages';
 
                 return (
-                  <button
+                  <Button
                     key={item.id}
                     type="button"
+                    variant="ghost"
                     onClick={() => setSelectedThreadId(item.id)}
-                    className={`w-full text-left px-4 py-4 transition-colors ${
-                      isSelected ? 'bg-red-50' : 'hover:bg-gray-50'
-                    }`}
+                    aria-current={isSelected ? 'true' : undefined}
+                    className={cn(
+                      'w-full flex-col items-start rounded-none px-4 py-4 text-left text-sm hover:bg-gray-50 focus-visible:ring-inset',
+                      isSelected && 'bg-red-50',
+                    )}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <p className="font-medium text-gray-900">{item.customerName}</p>
@@ -56,7 +61,7 @@ export default function AdminSupport() {
                     </div>
                     <p className="mt-1 text-sm text-gray-600 line-clamp-2">{preview}</p>
                     <p className="mt-1 text-xs text-gray-400">{item.messages.length} messages</p>
-                  </button>
+                  </Button>
                 );
               })}
             </div>

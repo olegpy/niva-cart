@@ -1,54 +1,54 @@
 'use client';
 
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { loginAction, type LoginState } from "../actions/login";
+import { Alert } from "@/shared/components/ui/alert";
+import { Button, formButtonClassName } from "@/shared/components/ui/button";
+import { FormField } from "@/shared/components/ui/form-field";
+import { Input } from "@/shared/components/ui/input";
 
 const initialState: LoginState = {};
 
 export default function LoginForm() {
     const [state, formAction, isPending] = useActionState(loginAction, initialState);
+    const errorId = useId();
+    const hasError = Boolean(state.error);
 
     return (
-        <form action={formAction} className="space-y-4">
-            {state.error && (
-                <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">
-                    {state.error}
-                </p>
+        <form action={formAction} className="space-y-4" aria-label="Admin sign in">
+            {hasError && (
+                <Alert id={errorId}>{state.error}</Alert>
             )}
-            <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                </label>
-                <input
-                    id="email"
+            <FormField
+                label="Email"
+                id="email"
+                invalid={hasError}
+                describedBy={hasError ? errorId : undefined}
+            >
+                <Input
                     name="email"
                     type="email"
                     required
                     autoComplete="email"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                 />
-            </div>
-            <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                    Password
-                </label>
-                <input
-                    id="password"
+            </FormField>
+            <FormField
+                label="Password"
+                id="password"
+                invalid={hasError}
+                describedBy={hasError ? errorId : undefined}
+            >
+                <Input
                     name="password"
                     type="password"
                     required
                     autoComplete="current-password"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
                 />
-            </div>
+            </FormField>
 
-            <button
-                type="submit"
-                disabled={isPending}
-                className="w-full bg-red-600 text-white rounded-lg py-2 font-medium hover:bg-red-700 disabled:opacity-50"
-                >
+            <Button type="submit" loading={isPending} className={formButtonClassName}>
                 {isPending ? 'Signing in…' : 'Sign in'}
-            </button>
+            </Button>
         </form>
     )
 }
