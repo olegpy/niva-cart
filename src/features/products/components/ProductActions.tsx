@@ -2,6 +2,8 @@
 
 import { Product } from '@/features/products/types';
 import { useCart } from "@/features/cart/context/CartContext";
+import { Button } from '@/shared/components/ui/button';
+import { cn } from '@/shared/lib/cn';
 
 interface ProductActionsProps {
   product: Product;
@@ -16,6 +18,7 @@ export default function ProductActions({
 }: ProductActionsProps) {
   const { addToCart, getItemQuantity, incrementQuantity, decrementQuantity, canAddToCart } = useCart();
   const cartQuantity = getItemQuantity(product.id);
+  const inStock = canAddToCart(product);
 
   const handleAddToCart = () => {
     addToCart(product);
@@ -38,22 +41,22 @@ export default function ProductActions({
             <span className="text-blue-600 font-medium"> | In cart: {cartQuantity}</span>
           )}
         </p>
-        <button
+        <Button
+          type="button"
+          variant="secondary"
           onClick={handleAddToCart}
-          className={`w-full py-2 px-4 rounded transition-colors ${
-            canAddToCart(product)
-              ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-              : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-          }`}
-          disabled={!canAddToCart(product)}
+          disabled={!inStock}
+          className={cn(
+            'w-full',
+            !inStock && 'cursor-not-allowed bg-gray-400 text-gray-600 hover:bg-gray-400',
+          )}
         >
           {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
-        </button>
+        </Button>
       </div>
     );
   }
 
-  // Details variant
   return (
     <div className={`space-y-4 ${className}`}>
       <div className="flex items-center space-x-4">
@@ -69,37 +72,41 @@ export default function ProductActions({
       )}
 
       {cartQuantity > 0 ? (
-        <div className="flex items-center space-x-4">
-          <button
+        <div className="flex items-center space-x-4" role="group" aria-label={`Quantity for ${product.title}`}>
+          <Button
+            type="button"
+            variant="outline"
             onClick={handleDecrement}
-            className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
             aria-label="Decrease quantity"
           >
             -
-          </button>
-          <span className="w-8 text-center font-semibold">{cartQuantity}</span>
-          <button
+          </Button>
+          <span className="w-8 text-center font-semibold" aria-live="polite">{cartQuantity}</span>
+          <Button
+            type="button"
+            variant="outline"
             onClick={handleIncrement}
-            className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 transition-colors"
             aria-label="Increase quantity"
-            disabled={!canAddToCart(product)}
+            disabled={!inStock}
           >
             +
-          </button>
+          </Button>
         </div>
       ) : (
-        <button
-          className={`w-full py-3 px-6 rounded-lg transition-colors ${
-            canAddToCart(product)
-              ? 'bg-blue-600 text-white hover:bg-blue-700 cursor-pointer'
-              : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-          }`}
+        <Button
+          type="button"
+          variant="secondary"
+          size="lg"
           onClick={handleAddToCart}
-          disabled={!canAddToCart(product)}
+          disabled={!inStock}
+          className={cn(
+            'w-full',
+            !inStock && 'cursor-not-allowed bg-gray-400 text-gray-600 hover:bg-gray-400',
+          )}
         >
           {product.quantity > 0 ? 'Add to Cart' : 'Out of Stock'}
-        </button>
+        </Button>
       )}
     </div>
   );
-} 
+}

@@ -5,6 +5,7 @@ import { Product } from "@/features/products/types";
 import { productImageSrc } from "@/features/products/lib/productImage";
 import { useCart } from "@/features/cart/context/CartContext";
 import Link from "next/link";
+import { Button } from '@/shared/components/ui/button';
 
 interface CartItemProps {
   item: {
@@ -57,37 +58,43 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
         <p className="text-gray-600">${product.price.toFixed(2)}</p>
       </Link>
       <div className="flex items-center gap-4 justify-between sm:justify-end w-full">
-        <div className="flex items-center gap-2">
-          <button
+        <div className="flex items-center gap-2" role="group" aria-label={`Quantity for ${product.title}`}>
+          <Button
+            type="button"
+            variant="outline"
+            size="xs"
             onClick={() => decrementQuantity(product.id)}
-            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-colors cursor-pointer"
             aria-label="Decrease quantity"
           >
             -
-          </button>
-          <span className="w-8 text-center" data-testid="item-quantity">{quantity}</span>
-          <button
+          </Button>
+          <span className="w-8 text-center" data-testid="item-quantity" aria-live="polite">{quantity}</span>
+          <Button
+            type="button"
+            variant="outline"
+            size="xs"
             onClick={() => incrementQuantity(product.id)}
-            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 transition-color"
             aria-label="Increase quantity"
             disabled={!canAddToCart(product)}
           >
             +
-          </button>
+          </Button>
         </div>
         <div className="gap-4 flex items-center">
           <div className="text-sm font-semibold">
             <span data-testid="item-total">${(product.price * quantity).toFixed(2)}</span>
           </div>
-          <button
+          <Button
+            type="button"
+            variant="ghost"
             onClick={() => removeFromCart(product.id)}
-            className="text-red-500 hover:text-red-700 cursor-pointer transition-colors"
             aria-label="Remove item from cart"
+            className="text-red-500 hover:text-red-700 cursor-pointer"
           >
             Remove
-          </button>
+          </Button>
         </div>
       </div>
     </div>
   );
-} 
+}
