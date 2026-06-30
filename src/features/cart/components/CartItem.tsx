@@ -5,7 +5,7 @@ import { Product } from "@/features/products/types";
 import { productImageSrc } from "@/features/products/lib/productImage";
 import { useCart } from "@/features/cart/context/CartContext";
 import Link from "next/link";
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@/shared/components/ui';
 
 interface CartItemProps {
   item: {

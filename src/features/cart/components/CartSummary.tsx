@@ -1,7 +1,7 @@
 'use client';
 
 import { useCart } from "@/features/cart/context/CartContext";
-import { Button } from '@/shared/components/ui/button';
+import { Button } from '@/shared/components/ui';
 
 interface CartSummaryProps {
   showItemCount?: boolean;
