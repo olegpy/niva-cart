@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { MOCK_SUPPORT_THREADS } from '@/features/admin/support/components/mockSupportData';
-import type { SupportMessage } from '@/features/admin/support/types';
+import type { ChatMessage } from '@/features/support/types';
 import { Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib/cn';
 
@@ -54,7 +54,7 @@ export default function AdminSupport() {
                     )}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-medium text-gray-900">{item.customerName}</p>
+                      <p className="font-medium text-gray-900">{item.name}</p>
                       <span className="text-xs text-gray-500 shrink-0">
                         {formatTime(item.updatedAt)}
                       </span>
@@ -77,12 +77,12 @@ export default function AdminSupport() {
             {thread && (
               <>
                 <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">{thread.customerName}</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">{thread.name}</h2>
                   <p className="text-sm text-gray-500">Customer support thread</p>
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[480px]">
-                  {thread.messages.map((message: SupportMessage) => {
+                  {thread.messages.map((message: ChatMessage) => {
                     const isAdmin = message.authorRole === 'admin';
 
                     return (
