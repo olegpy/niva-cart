@@ -13,6 +13,17 @@ import {
   Textarea,
   formButtonClassName,
 } from '@/shared/components/ui';
+import { getChatAction } from '@/features/support/actions/getChat';
+import {
+  sendMessageAction,
+  type SendMessageState,
+} from '@/features/support/actions/sendMessage';
+import {
+  clearChatId,
+  readChatId,
+  saveChatId,
+} from '@/features/support/lib/chatStorage';
+import type { ChatMessage, SupportChat } from '@/features/support/types';
 
 const VIEW = {
   form: 'form',
@@ -21,26 +32,17 @@ const VIEW = {
 
 type View = (typeof VIEW)[keyof typeof VIEW];
 
-const DEMO_MESSAGES = [
-  {
-    id: '1',
-    authorRole: 'customer' as const,
-    authorName: 'You',
-    text: 'Hi, I have a question about my order.',
-    createdAt: '10:32 AM',
-  },
-  {
-    id: '2',
-    authorRole: 'admin' as const,
-    authorName: 'Support',
-    text: 'Hello! Happy to help — what is your order number?',
-    createdAt: '10:33 AM',
-  },
-];
+function formatMessageTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
 
 export default function SupportWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [view, setView] = useState<View>(VIEW.form);
+  const [chat, setChat] = useState<SupportChat | null>(null);
 
   function closeModal() {
     setIsOpen(false);
@@ -49,6 +51,20 @@ export default function SupportWidget() {
   function openModal() {
     setIsOpen(true);
   }
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const savedId = readChatId();
+    if (!savedId) return;
+    getChatAction(savedId).then((loaded) => {
+      if (loaded) {
+        setChat(loaded);
+        setView(VIEW.chat);
+      } else {
+        clearChatId();
+      }
+    });
+  }, [isOpen]);
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
@@ -91,9 +107,22 @@ export default function SupportWidget() {
           </div>
 
           {view === VIEW.form ? (
-            <SupportForm onSuccess={() => setView(VIEW.chat)} />
+            <SupportForm onSuccess={(newChat) => {
+              setChat(newChat);
+              setView(VIEW.chat);
+            }} />
           ) : (
-            <SupportChat onBack={() => setView(VIEW.form)} />
+            chat && (
+              <SupportChat
+                key={chat.id}
+                chat={chat}
+                onNewChat={() => {
+                  clearChatId();
+                  setChat(null);
+                  setView(VIEW.form);
+                }}
+              />
+            )
           )}
         </div>
       )}
@@ -127,7 +156,7 @@ export default function SupportWidget() {
 
 const initialStartChatState: StartChatState = {};
 
-function SupportForm({ onSuccess }: { onSuccess: () => void }) {
+function SupportForm({ onSuccess }: { onSuccess: (chat: SupportChat) => void }) {
   const [state, formAction, isPending] = useActionState(
     startChatAction,
     initialStartChatState,
@@ -137,7 +166,8 @@ function SupportForm({ onSuccess }: { onSuccess: () => void }) {
 
   useEffect(() => {
     if (state.ok === true) {
-      onSuccess();
+      saveChatId(state.data.id);
+      onSuccess(state.data);
     }
   }, [state, onSuccess]);
 
@@ -205,11 +235,25 @@ function SupportForm({ onSuccess }: { onSuccess: () => void }) {
   );
 }
 
-function SupportChat({ onBack }: { onBack: () => void }) {
+function SupportChat({ chat, onNewChat }: { chat: SupportChat; onNewChat: () => void }) {
+  const [messages, setMessages] = useState<ChatMessage[]>(chat.messages);
+  const [state, formAction, isPending] = useActionState(
+    async (prevState: SendMessageState, formData: FormData): Promise<SendMessageState> => {
+      const result = await sendMessageAction(prevState, formData);
+      if (result.ok === true) {
+        setMessages((prev) => [...prev, result.data]);
+      }
+      return result;
+    },
+    {} as SendMessageState,
+  );
+  const errorId = useId();
+  const hasError = state.ok === false;
+
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex-1 space-y-3 overflow-y-auto p-5">
-        {DEMO_MESSAGES.map((message) => {
+        {messages.map((message) => {
           const isCustomer = message.authorRole === 'customer';
 
           return (
@@ -229,7 +273,7 @@ function SupportChat({ onBack }: { onBack: () => void }) {
                 >
                   <span className="font-medium">{message.authorName}</span>
                   <span>·</span>
-                  <span>{message.createdAt}</span>
+                  <span>{formatMessageTime(message.createdAt)}</span>
                 </div>
                 <p className="text-sm whitespace-pre-wrap">{message.text}</p>
               </div>
@@ -238,15 +282,22 @@ function SupportChat({ onBack }: { onBack: () => void }) {
         })}
       </div>
 
+      {hasError && <Alert id={errorId}>{state.error}</Alert>}
+
       <div className="border-t border-gray-200 p-4">
-        <form className="flex gap-2" onSubmit={(e) => e.preventDefault()} aria-label="Send a message">
+        <form action={formAction} className="flex gap-2" aria-label="Send a message">
+          <input type="hidden" name="chatId" value={chat.id} />
+          <input type="hidden" name="authorName" value={chat.name} />
           <Input
+            name="text"
             type="text"
+            required
             placeholder="Type a message…"
             aria-label="Message"
             className="min-w-0 flex-1"
+            disabled={isPending}
           />
-          <Button type="submit" size="icon" aria-label="Send message">
+          <Button type="submit" size="icon" aria-label="Send message" loading={isPending}>
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -258,8 +309,8 @@ function SupportChat({ onBack }: { onBack: () => void }) {
           </Button>
         </form>
 
-        <Button type="button" variant="link" onClick={onBack} className="mt-3 p-0 h-auto rounded-none">
-          Back to form (preview)
+        <Button type="button" variant="link" onClick={onNewChat} className="mt-3 p-0 h-auto rounded-none">
+          New conversation
         </Button>
       </div>
     </div>

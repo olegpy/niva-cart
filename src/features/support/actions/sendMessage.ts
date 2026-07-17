@@ -8,7 +8,7 @@ import { actionError, actionSuccess } from '../lib/actionResponses';
 
 const CHAT_SESSION_NOT_FOUND_ERROR = 'Chat session not found. Please start a new conversation.';
 
-type SendMessageState = ActionState<ChatMessage>
+export type SendMessageState = ActionState<ChatMessage>
 
 export async function sendMessageAction(
     _prevState: SendMessageState,
