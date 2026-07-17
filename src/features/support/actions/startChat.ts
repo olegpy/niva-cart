@@ -1,13 +1,12 @@
 'use server';
 
-export type StartChatState = {
-  error?: string;
-  success?: boolean;
-};
+import { serializeChat } from '@/features/support/lib/serialise';
+import { isValidEmail } from '@/features/support/lib/validation';
+import type { ActionState, SupportChat } from '@/features/support/types';
+import { prisma } from '@/shared/lib/prisma';
+import { actionError, actionSuccess } from '../lib/actionResponses';
 
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+export type StartChatState = ActionState<SupportChat>;
 
 export async function startChatAction(
   _prevState: StartChatState,
@@ -18,21 +17,39 @@ export async function startChatAction(
   const question = String(formData.get('question') ?? '').trim();
 
   if (!name) {
-    return { error: 'Please enter your name.' };
+    return actionError('Please enter your name.');
   }
 
   if (!email) {
-    return { error: 'Please enter your email.' };
+    return actionError('Please enter your email.');
   }
 
   if (!isValidEmail(email)) {
-    return { error: 'Please enter a valid email address.' };
+    return actionError('Please enter a valid email address.');
   }
 
   if (!question) {
-    return { error: 'Please enter your question.' };
+    return actionError('Please enter your question.');
   }
 
-  // TODO: create SupportThread + first message in DB
-  return { success: true };
+  const chat = await prisma.supportChat.create({
+    data: {
+      name,
+      email,
+      messages: {
+        create: {
+          authorRole: 'customer',
+          authorName: name,
+          text: question,
+        },
+      },
+    },
+    include: {
+      messages: {
+        orderBy: { createdAt: 'asc' },
+      },
+    },
+  });
+
+  return actionSuccess(serializeChat(chat));
 }

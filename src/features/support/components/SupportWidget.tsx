@@ -133,13 +133,13 @@ function SupportForm({ onSuccess }: { onSuccess: () => void }) {
     initialStartChatState,
   );
   const errorId = useId();
-  const hasError = Boolean(state.error);
+  const hasError = state.ok === false;
 
   useEffect(() => {
-    if (state.success) {
+    if (state.ok === true) {
       onSuccess();
     }
-  }, [state.success, onSuccess]);
+  }, [state, onSuccess]);
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto p-5">

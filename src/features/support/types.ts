@@ -19,3 +19,15 @@ export interface SupportChat {
   updatedAt: string;
   messages: ChatMessage[];
 }
+
+type ActionIdle = Record<string, never>; 
+export type ActionError = {
+  ok: false;
+  error: string;
+};
+export type ActionSuccess<T> = {
+  ok: true;
+  data: T;
+};
+
+export type ActionState<T> = ActionIdle | ActionError | ActionSuccess<T>;
