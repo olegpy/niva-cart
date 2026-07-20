@@ -1,33 +1,34 @@
 'use client';
 
 import { useState } from 'react';
-import { MOCK_SUPPORT_THREADS } from '@/features/admin/support/components/mockSupportData';
-import type { ChatMessage } from '@/features/support/types';
+import type { SupportChat } from '@/features/support/types';
 import { Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib/cn';
+import { AdminChatDetails } from './AdminChatDetail';
+import { formatTime } from '@/features/support/lib/formatTime';
 
-function formatTime(iso: string): string {
-  return new Date(iso).toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
+type AdminSupportProps = {
+  initialChats: SupportChat[];
+};
 
-export default function AdminSupport() {
-  const [selectedThreadId, setSelectedThreadId] = useState(MOCK_SUPPORT_THREADS[0]?.id ?? null);
-  const thread = MOCK_SUPPORT_THREADS.find((item) => item.id === selectedThreadId) ?? null;
+export default function AdminSupport({ initialChats }: AdminSupportProps) {
+  const [selectedThreadId, setSelectedThreadId] = useState(initialChats[0]?.id ?? null);
+  const chat = initialChats.find((item) => item.id === selectedThreadId) ?? null;
 
   return (
     <div className="p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Support Inbox</h1>
-          <p className="text-gray-600 mt-2">View customer questions (demo data)</p>
+          <p className="text-gray-600 mt-2">Customer support conversations</p>
         </div>
+        {initialChats.length === 0 && (
+          <div className="text-sm text-gray-500">
+            No conversations yet
+          </div>
+        )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[600px]">
+        {initialChats.length > 0 && <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[600px]">
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-200">
               <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
@@ -36,7 +37,7 @@ export default function AdminSupport() {
             </div>
 
             <div className="divide-y divide-gray-100 max-h-[540px] overflow-y-auto">
-              {MOCK_SUPPORT_THREADS.map((item) => {
+              {initialChats.map((item) => {
                 const isSelected = item.id === selectedThreadId;
                 const lastMessage = item.messages.at(-1);
                 const preview = lastMessage?.text ?? 'No messages';
@@ -68,53 +69,16 @@ export default function AdminSupport() {
           </div>
 
           <div className="lg:col-span-2 bg-white rounded-lg shadow flex flex-col overflow-hidden">
-            {!thread && (
+            {!chat && (
               <div className="flex flex-1 items-center justify-center p-8 text-sm text-gray-500">
                 Select a conversation to view messages
               </div>
             )}
 
-            {thread && (
-              <>
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900">{thread.name}</h2>
-                  <p className="text-sm text-gray-500">Customer support thread</p>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[480px]">
-                  {thread.messages.map((message: ChatMessage) => {
-                    const isAdmin = message.authorRole === 'admin';
-
-                    return (
-                      <div
-                        key={message.id}
-                        className={`flex ${isAdmin ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-[80%] rounded-lg px-4 py-3 ${
-                            isAdmin
-                              ? 'bg-red-600 text-white'
-                              : 'bg-gray-100 text-gray-900'
-                          }`}
-                        >
-                          <div className={`flex items-center gap-2 text-xs mb-1 ${
-                            isAdmin ? 'text-red-100' : 'text-gray-500'
-                          }`}>
-                            <span className="font-medium">{message.authorName}</span>
-                            <span>{isAdmin ? '(Support)' : '(Customer)'}</span>
-                            <span>·</span>
-                            <span>{formatTime(message.createdAt)}</span>
-                          </div>
-                          <p className="text-sm whitespace-pre-wrap">{message.text}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </>
-            )}
+            {chat && <AdminChatDetails chat={chat} />}
+            
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );
