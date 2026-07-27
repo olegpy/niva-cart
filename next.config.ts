@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   // Enable React 15 features compatibility
   reactStrictMode: true,
+  transpilePackages: ["@niva/support-realtime"],
 
   // Optimize images from external domains
   images: {
