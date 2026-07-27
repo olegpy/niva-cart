@@ -1,19 +1,49 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { SupportChat } from '@/features/support/types';
+import type { SupportRealtimeMessage } from '@niva/support-realtime';
 import { Button } from '@/shared/components/ui';
 import { cn } from '@/shared/lib/cn';
 import { AdminChatDetails } from './AdminChatDetail';
 import { formatTime } from '@/features/support/lib/formatTime';
+import { useAdminInboxSocket } from '@/features/support/hooks/useAdminInboxSocket';
+import { getSupportChatsAction } from '@/features/support/actions/getSupportChats';
+import { appendUniqueMessage } from '@/features/support/lib/appendUniqueMessage';
 
 type AdminSupportProps = {
   initialChats: SupportChat[];
 };
 
 export default function AdminSupport({ initialChats }: AdminSupportProps) {
+  const [chats, setChats] = useState(initialChats);
   const [selectedThreadId, setSelectedThreadId] = useState(initialChats[0]?.id ?? null);
-  const chat = initialChats.find((item) => item.id === selectedThreadId) ?? null;
+  const chat = chats.find((item) => item.id === selectedThreadId) ?? null;
+
+  const handleInboxMessage = useCallback((message: SupportRealtimeMessage) => {
+    setChats((prev) => {
+      const index = prev.findIndex((item) => item.id === message.chatId);
+
+      if (index === -1) {
+        void getSupportChatsAction().then(setChats);
+        return prev;
+      }
+
+      const current = prev[index];
+      const messages = appendUniqueMessage(current.messages, message);
+      if (messages === current.messages) return prev;
+
+      const updated: SupportChat = {
+        ...current,
+        messages,
+        updatedAt: message.createdAt,
+      };
+
+      return [updated, ...prev.filter((item) => item.id !== message.chatId)];
+    });
+  }, []);
+
+  useAdminInboxSocket(handleInboxMessage);
 
   return (
     <div className="p-6">
@@ -22,13 +52,13 @@ export default function AdminSupport({ initialChats }: AdminSupportProps) {
           <h1 className="text-3xl font-bold text-gray-900">Support Inbox</h1>
           <p className="text-gray-600 mt-2">Customer support conversations</p>
         </div>
-        {initialChats.length === 0 && (
+        {chats.length === 0 && (
           <div className="text-sm text-gray-500">
             No conversations yet
           </div>
         )}
 
-        {initialChats.length > 0 && <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[600px]">
+        {chats.length > 0 && <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[600px]">
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="px-4 py-3 border-b border-gray-200">
               <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wide">
@@ -37,7 +67,7 @@ export default function AdminSupport({ initialChats }: AdminSupportProps) {
             </div>
 
             <div className="divide-y divide-gray-100 max-h-[540px] overflow-y-auto">
-              {initialChats.map((item) => {
+              {chats.map((item) => {
                 const isSelected = item.id === selectedThreadId;
                 const lastMessage = item.messages.at(-1);
                 const preview = lastMessage?.text ?? 'No messages';
@@ -75,7 +105,7 @@ export default function AdminSupport({ initialChats }: AdminSupportProps) {
               </div>
             )}
 
-            {chat && <AdminChatDetails chat={chat} />}
+            {chat && <AdminChatDetails key={chat.id} chat={chat} />}
             
           </div>
         </div>}

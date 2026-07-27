@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useId, useState } from 'react';
+import { useActionState, useCallback, useEffect, useId, useState } from 'react';
 import {
   startChatAction,
   type StartChatState,
@@ -13,17 +13,20 @@ import {
   Textarea,
   formButtonClassName,
 } from '@/shared/components/ui';
-import { getChatAction } from '@/features/support/actions/getChat';
 import {
   sendMessageAction,
   type SendMessageState,
 } from '@/features/support/actions/sendMessage';
+import { getChatAction } from '@/features/support/actions/getChat';
 import {
   clearChatId,
   readChatId,
   saveChatId,
 } from '@/features/support/lib/chatStorage';
 import type { ChatMessage, SupportChat } from '@/features/support/types';
+import { SUPPORT_ROLE } from '@niva/support-realtime';
+import { useSupportSocket } from '../hooks/useSupportSocket';
+import { appendUniqueMessage } from '@/features/support/lib/appendUniqueMessage';
 
 const VIEW = {
   form: 'form',
@@ -53,9 +56,11 @@ export default function SupportWidget() {
   }
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || chat) return;
+
     const savedId = readChatId();
     if (!savedId) return;
+
     getChatAction(savedId).then((loaded) => {
       if (loaded) {
         setChat(loaded);
@@ -64,7 +69,7 @@ export default function SupportWidget() {
         clearChatId();
       }
     });
-  }, [isOpen]);
+  }, [isOpen, chat]);
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
@@ -107,10 +112,13 @@ export default function SupportWidget() {
           </div>
 
           {view === VIEW.form ? (
-            <SupportForm onSuccess={(newChat) => {
-              setChat(newChat);
-              setView(VIEW.chat);
-            }} />
+            <SupportForm
+              onSuccess={(newChat) => {
+                saveChatId(newChat.id);
+                setChat(newChat);
+                setView(VIEW.chat);
+              }}
+            />
           ) : (
             chat && (
               <SupportChat
@@ -166,7 +174,6 @@ function SupportForm({ onSuccess }: { onSuccess: (chat: SupportChat) => void }) 
 
   useEffect(() => {
     if (state.ok === true) {
-      saveChatId(state.data.id);
       onSuccess(state.data);
     }
   }, [state, onSuccess]);
@@ -241,12 +248,22 @@ function SupportChat({ chat, onNewChat }: { chat: SupportChat; onNewChat: () => 
     async (prevState: SendMessageState, formData: FormData): Promise<SendMessageState> => {
       const result = await sendMessageAction(prevState, formData);
       if (result.ok === true) {
-        setMessages((prev) => [...prev, result.data]);
+        setMessages((prev) => appendUniqueMessage(prev, result.data));
       }
       return result;
     },
     {} as SendMessageState,
   );
+  const handleSocketMessage = useCallback((message: ChatMessage) => {
+    setMessages((prev) => appendUniqueMessage(prev, message));
+  }, []);
+
+  useSupportSocket({
+    chatId: chat.id,
+    role: SUPPORT_ROLE.CUSTOMER,
+    onMessage: handleSocketMessage,
+  });
+
   const errorId = useId();
   const hasError = state.ok === false;
 
@@ -254,7 +271,7 @@ function SupportChat({ chat, onNewChat }: { chat: SupportChat; onNewChat: () => 
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="flex-1 space-y-3 overflow-y-auto p-5">
         {messages.map((message) => {
-          const isCustomer = message.authorRole === 'customer';
+          const isCustomer = message.authorRole === SUPPORT_ROLE.CUSTOMER;
 
           return (
             <div

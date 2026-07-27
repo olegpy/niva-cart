@@ -2,11 +2,14 @@
 
 import { getServerSession } from "next-auth";
 import { ActionState, ChatMessage } from "../types";
+import { SUPPORT_ROLE } from "@niva/support-realtime";
 import { authOptions } from "@/features/admin/auth/lib/auth";
+import { UserRole } from "@/features/admin/users/types";
 import { actionError, actionSuccess } from "../lib/actionResponses";
 import { validateMessageText } from "../lib/validation";
 import { prisma } from "@/shared/lib/prisma";
 import { serializeMessage } from "../lib/serialise";
+import { notifySupportMessage } from "@/features/support/lib/socket/notify";
 
 export type SendAdminReplyState = ActionState<ChatMessage>;
 
@@ -20,7 +23,7 @@ export async function sendAdminReplyAction(
 ): Promise<SendAdminReplyState> {
     const session = await getServerSession(authOptions);
     
-    if (!session?.user  || session.user.role !== 'admin') { 
+    if (!session?.user || session.user.role !== UserRole.admin) {
         return actionError(UNAUTHORIZED_ERROR);
     }
 
@@ -48,7 +51,7 @@ export async function sendAdminReplyAction(
                 chatId,
                 text,
                 authorName,
-                authorRole: 'admin',
+                authorRole: SUPPORT_ROLE.ADMIN,
             }
         });
 
@@ -62,5 +65,7 @@ export async function sendAdminReplyAction(
         return created;
     });
 
-    return actionSuccess(serializeMessage(message));
+    const serialized = serializeMessage(message);
+    await notifySupportMessage({ chatId, message: serialized });
+    return actionSuccess(serialized);
 }

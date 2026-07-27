@@ -3,8 +3,10 @@
 import { serializeMessage } from '@/features/support/lib/serialise';
 import { validateMessageText } from '@/features/support/lib/validation';
 import type { ActionState, ChatMessage } from '@/features/support/types';
+import { SUPPORT_ROLE } from '@niva/support-realtime';
 import { prisma } from '@/shared/lib/prisma';
 import { actionError, actionSuccess } from '../lib/actionResponses';
+import { notifySupportMessage } from '@/features/support/lib/socket/notify';
 
 const CHAT_SESSION_NOT_FOUND_ERROR = 'Chat session not found. Please start a new conversation.';
 
@@ -44,7 +46,7 @@ export async function sendMessageAction(
         const created = await tx.chatMessage.create({
             data: {
                 chatId,
-                authorRole: 'customer',
+                authorRole: SUPPORT_ROLE.CUSTOMER,
                 authorName: authorName || 'You',
                 text,
             },
@@ -58,5 +60,7 @@ export async function sendMessageAction(
         return created;
     });
 
-    return actionSuccess(serializeMessage(message));
+    const serialized = serializeMessage(message);
+    await notifySupportMessage({ chatId, message: serialized });
+    return actionSuccess(serialized);
 }

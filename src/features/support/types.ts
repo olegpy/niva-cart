@@ -1,4 +1,6 @@
-export type MessageAuthorRole = 'customer' | 'admin';
+import type { SupportRole } from '@niva/support-realtime';
+
+export type MessageAuthorRole = SupportRole;
 export type ChatStatus = 'open' | 'closed';
 
 export interface ChatMessage {
@@ -20,7 +22,7 @@ export interface SupportChat {
   messages: ChatMessage[];
 }
 
-type ActionIdle = Record<string, never>; 
+type ActionIdle = Record<string, never>;
 export type ActionError = {
   ok: false;
   error: string;

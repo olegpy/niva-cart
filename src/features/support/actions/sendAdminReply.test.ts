@@ -3,6 +3,7 @@ import { sendAdminReplyAction } from './sendAdminReply';
 const mockGetServerSession = jest.fn();
 const mockFindUnique = jest.fn();
 const mockTransaction = jest.fn();
+const mockNotifySupportMessage = jest.fn();
 
 jest.mock('next-auth', () => ({
   getServerSession: (...args: unknown[]) => mockGetServerSession(...args),
@@ -21,6 +22,10 @@ jest.mock('@/shared/lib/prisma', () => ({
   },
 }));
 
+jest.mock('@/features/support/lib/socket/notify', () => ({
+  notifySupportMessage: (...args: unknown[]) => mockNotifySupportMessage(...args),
+}));
+
 function formData(entries: Record<string, string>): FormData {
   const data = new FormData();
   for (const [key, value] of Object.entries(entries)) {
@@ -34,6 +39,8 @@ describe(sendAdminReplyAction.name, () => {
     mockGetServerSession.mockReset();
     mockFindUnique.mockReset();
     mockTransaction.mockReset();
+    mockNotifySupportMessage.mockReset();
+    mockNotifySupportMessage.mockResolvedValue(undefined);
   });
 
   it('returns unauthorized when there is no admin session', async () => {
@@ -160,6 +167,17 @@ describe(sendAdminReplyAction.name, () => {
       },
     });
     expect(update).toHaveBeenCalled();
+    expect(mockNotifySupportMessage).toHaveBeenCalledWith({
+      chatId: 'c1',
+      message: {
+        id: 'msg-1',
+        chatId: 'c1',
+        authorRole: 'admin',
+        authorName: 'Admin User',
+        text: 'We can help',
+        createdAt: '2026-06-10T15:00:00.000Z',
+      },
+    });
     expect(result).toEqual({
       ok: true,
       data: {

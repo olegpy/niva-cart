@@ -1,18 +1,32 @@
 import { sendAdminReplyAction, SendAdminReplyState } from "@/features/support/actions/sendAdminReply";
+import { useSupportSocket } from "@/features/support/hooks/useSupportSocket";
+import { appendUniqueMessage } from "@/features/support/lib/appendUniqueMessage";
 import { formatTime } from "@/features/support/lib/formatTime";
 import { ChatMessage, SupportChat } from "@/features/support/types";
+import { SUPPORT_ROLE } from "@niva/support-realtime";
 import { Alert, Button, Input } from "@/shared/components/ui";
-import { useActionState, useId, useState } from "react";
+import { useActionState, useCallback, useId, useState } from "react";
 
-export function AdminChatDetails({ chat }: { chat: SupportChat }  ) {
+export function AdminChatDetails({ chat }: { chat: SupportChat }) {
     const [messages, setMessages] = useState<ChatMessage[]>(chat.messages);
+
+    const handleSocketMessage = useCallback((message: ChatMessage) => {
+      setMessages((prev) => appendUniqueMessage(prev, message));
+    }, []);
+
+    useSupportSocket({
+      chatId: chat.id,
+      role: SUPPORT_ROLE.ADMIN,
+      onMessage: handleSocketMessage,
+    });
+
     const [state, formAction, isPending] = useActionState(async (
         prevState: SendAdminReplyState,
         formData: FormData,
       ): Promise<SendAdminReplyState> => {
         const result = await sendAdminReplyAction(prevState, formData);
-        if (result.ok) {
-          setMessages((prev) => [...prev, result.data]);
+        if (result.ok === true) {
+          setMessages((prev) => appendUniqueMessage(prev, result.data));
         }
         return result;
       },
@@ -21,7 +35,7 @@ export function AdminChatDetails({ chat }: { chat: SupportChat }  ) {
 
 
     const errorId = useId();
-    const hasError = !state.ok;
+    const hasError = state.ok === false;
 
     return (
         <>
@@ -31,7 +45,7 @@ export function AdminChatDetails({ chat }: { chat: SupportChat }  ) {
             </div>
             <div className="flex-1 overflow-y-auto p-6 space-y-4 max-h-[480px]">
                 { messages.map((message: ChatMessage) => {
-                    const isAdmin = message.authorRole === 'admin';
+                    const isAdmin = message.authorRole === SUPPORT_ROLE.ADMIN;
 
                     return (
                       <div

@@ -3,8 +3,10 @@
 import { serializeChat } from '@/features/support/lib/serialise';
 import { isValidEmail } from '@/features/support/lib/validation';
 import type { ActionState, SupportChat } from '@/features/support/types';
+import { SUPPORT_ROLE } from '@niva/support-realtime';
 import { prisma } from '@/shared/lib/prisma';
 import { actionError, actionSuccess } from '../lib/actionResponses';
+import { notifySupportMessage } from '@/features/support/lib/socket/notify';
 
 export type StartChatState = ActionState<SupportChat>;
 
@@ -38,7 +40,7 @@ export async function startChatAction(
       email,
       messages: {
         create: {
-          authorRole: 'customer',
+          authorRole: SUPPORT_ROLE.CUSTOMER,
           authorName: name,
           text: question,
         },
@@ -51,5 +53,11 @@ export async function startChatAction(
     },
   });
 
-  return actionSuccess(serializeChat(chat));
+  const serialized = serializeChat(chat);
+  const firstMessage = serialized.messages[0];
+  if (firstMessage) {
+    await notifySupportMessage({ chatId: serialized.id, message: firstMessage });
+  }
+
+  return actionSuccess(serialized);
 }
