@@ -1,0 +1,35 @@
+import type { SupportRole } from '@niva/support-realtime';
+
+export type MessageAuthorRole = SupportRole;
+export type ChatStatus = 'open' | 'closed';
+
+export interface ChatMessage {
+  id: string;
+  chatId: string;
+  authorRole: MessageAuthorRole;
+  authorName: string;
+  text: string;
+  createdAt: string;
+}
+
+export interface SupportChat {
+  id: string;
+  name: string;
+  email: string;
+  status: ChatStatus;
+  createdAt: string;
+  updatedAt: string;
+  messages: ChatMessage[];
+}
+
+type ActionIdle = Record<string, never>;
+export type ActionError = {
+  ok: false;
+  error: string;
+};
+export type ActionSuccess<T> = {
+  ok: true;
+  data: T;
+};
+
+export type ActionState<T> = ActionIdle | ActionError | ActionSuccess<T>;
