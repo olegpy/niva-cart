@@ -15,11 +15,12 @@ Protected routes: `/admin`, `/admin/users`, `/admin/support`. Auth via **next-au
 ## What this project includes
 
 - **Storefront** — product listing, product detail, client-side cart
-- **Admin dashboard** — analytics, user management, support page
+- **Admin dashboard** — analytics, user management, support inbox
+- **Support chat** — customer widget + admin inbox, persisted in Postgres, live updates via Socket.IO
 - **Authentication** — credentials login, JWT session, route protection
 - **Database** — Postgres (Prisma), seeded demo users
 - **Testing** — Jest (unit), Playwright (e2e), Lighthouse CI
-- **Deploy** — Vercel + GitHub Actions
+- **Deploy** — Next.js on Vercel; Socket.IO microservice on Railway
 
 ## Lighthouse scores
 
@@ -43,11 +44,12 @@ Details: [LIGHTHOUSE_SETUP.md](./LIGHTHOUSE_SETUP.md)
 ```bash
 npm install
 npm run dev          # http://localhost:3000
+npm run socket:dev   # Socket.IO on http://localhost:3001 (needed for live support chat)
 npm test             # unit tests
 npm run test:e2e     # Playwright (see e2e/ for setup)
 ```
 
-For local Postgres: `docker compose up -d`, then `npm run db:migrate`. See **Admin authentication** below for env vars and seed.
+For local Postgres: `docker compose up -d`, then `npm run db:migrate`. See **Admin authentication** below for env vars and seed. Live support chat also needs `npm run socket:dev` — details in [`packages/socket-server/README.md`](./packages/socket-server/README.md).
 
 ## Admin authentication
 
@@ -111,9 +113,18 @@ DATABASE_URL="postgresql://...:5432/postgres" npm run db:seed
 
 Logout is in the admin dashboard header. Login uses a separate layout under `src/app/admin/(auth)/`.
 
+## Support chat (Socket.IO)
+
+Customer widget + admin inbox use Postgres for messages and a Socket.IO microservice for live updates (Next on Vercel, sockets on Railway).
+
+Try locally: `npm run socket:dev` + `npm run dev`, then the storefront widget and `/admin/support`.  
+Prod: [storefront](https://niva-cart.vercel.app) · [admin support](https://niva-cart.vercel.app/admin/support) · [socket health](https://niva-cart-production.up.railway.app/health).
+
+Setup, Railway, and debug: [`packages/socket-server/README.md`](./packages/socket-server/README.md).
+
 ## Stack
 
-Next.js 16 · TypeScript · Tailwind CSS · Prisma · Postgres · next-auth · Jest · Playwright · Lighthouse · Vercel
+Next.js 16 · TypeScript · Tailwind CSS · Prisma · Postgres · next-auth · Socket.IO · Jest · Playwright · Lighthouse · Vercel · Railway
 
 ## Contributing
 
