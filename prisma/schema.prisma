@@ -51,3 +51,13 @@ model ChatMessage {
 
   @@index([chatId, createdAt])
 }
+
+model FavouriteItem {
+  id        Int      @id @default(autoincrement())
+  sessionId String
+  productId Int
+  createdAt DateTime @default(now())
+
+  @@unique([sessionId, productId])
+  @@index([sessionId])
+}

@@ -4,6 +4,10 @@ import { CartProvider, useCart } from '@/features/cart/context/CartContext';
 import { Product } from '@/features/products/types';
 import { mockCategory } from '@/shared/test-utils/product';
 
+jest.mock('@/features/cart/actions/addToFavourites', () => ({
+  addToFavourites: jest.fn(),
+}));
+
 // Wrapper component for testing
 const TestWrapper = ({ children }: { children: React.ReactNode }) => (
   <CartProvider>{children}</CartProvider>

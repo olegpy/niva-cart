@@ -1,10 +1,12 @@
 'use client';
 
 import Image from "next/image";
+import Link from "next/link";
+import { useState, useTransition } from "react";
 import { Product } from "@/features/products/types";
 import { productImageSrc } from "@/features/products/lib/productImage";
 import { useCart } from "@/features/cart/context/CartContext";
-import Link from "next/link";
+import { addToFavourites } from "@/features/cart/actions/addToFavourites";
 import { Button } from '@/shared/components/ui';
 
 interface CartItemProps {
@@ -17,6 +19,8 @@ interface CartItemProps {
 
 export default function CartItem({ item, compact = false }: CartItemProps) {
   const { incrementQuantity, decrementQuantity, removeFromCart, canAddToCart } = useCart();
+  const [isPending, startTransition] = useTransition();
+  const [favouriteError, setFavouriteError] = useState<string | null>(null);
   const { product, quantity } = item;
 
   if (compact) {
@@ -41,6 +45,18 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
       </div>
     );
   }
+
+  const handleAddToFavourites = () => {
+    setFavouriteError(null);
+    startTransition(async () => {
+      const result = await addToFavourites(product.id);
+      if (result.ok) {
+        removeFromCart(product.id);
+      } else {
+        setFavouriteError(result.error);
+      }
+    });
+  };
 
   return (
     <div className="flex items-center gap-4 bg-white p-4 rounded-lg shadow dark:text-gray-600 sm:flex-nowrap flex-wrap ">
@@ -87,14 +103,34 @@ export default function CartItem({ item, compact = false }: CartItemProps) {
           <Button
             type="button"
             variant="ghost"
+            onClick={handleAddToFavourites}
+            aria-label={`Add ${product.title} to favourites`}
+            disabled={isPending}
+          >
+            Add to favourites
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
             onClick={() => removeFromCart(product.id)}
             aria-label="Remove item from cart"
+            disabled={isPending}
             className="text-red-500 hover:text-red-700 cursor-pointer"
           >
             Remove
           </Button>
         </div>
       </div>
+      {favouriteError && (
+        <p
+          role="status"
+          aria-live="polite"
+          data-testid="add-to-favourites-error"
+          className="w-full text-sm text-red-600"
+        >
+          {favouriteError}
+        </p>
+      )}
     </div>
   );
 }

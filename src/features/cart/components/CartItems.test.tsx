@@ -3,6 +3,10 @@ import CartItems from './CartItems';
 import { Product } from '@/features/products/types';
 import { mockCategory } from '@/shared/test-utils/product';
 
+jest.mock('@/features/cart/actions/addToFavourites', () => ({
+  addToFavourites: jest.fn(),
+}));
+
 // Mock the useCart hook
 jest.mock('@/features/cart/context/CartContext', () => ({
   ...jest.requireActual('@/features/cart/context/CartContext'),

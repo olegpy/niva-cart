@@ -13,7 +13,6 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
     <div className="max-w-7xl mx-auto">
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-         Product Image
         <div className="relative h-[500px] w-full">
           <Image
             src={productImageSrc(product)}

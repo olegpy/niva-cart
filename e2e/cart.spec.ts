@@ -74,4 +74,57 @@ test.describe('cart', () => {
     await expect(page.locator('main').getByTestId('item-total').first()).toHaveText('$20.00');
     await expect(page.locator('main').getByTestId('cart-summary-container')).toContainText('Total: $20.00');
   });
+
+  test('adding to favourites removes the line and restoring brings it back at quantity 1', async ({ page }) => {
+    await page.goto('/');
+    await addToCartFromHome(page, productTitles[0]);
+    await openCartFromHeader(page);
+
+    await page
+      .locator('main')
+      .getByRole('button', { name: `Add ${productTitles[0]} to favourites` })
+      .click();
+
+    await expect(page.getByText('Your cart is empty')).toBeVisible();
+    await expect(
+      page.locator('main').getByRole('heading', { level: 2, name: /Favourites/ }),
+    ).toBeVisible();
+
+    await page
+      .locator('main')
+      .getByRole('button', { name: `Move to Cart: ${productTitles[0]}` })
+      .click();
+
+    await expect(
+      page.locator('main').getByRole('heading', { name: productTitles[0] }),
+    ).toBeVisible();
+    await expect(page.locator('main').getByTestId('item-quantity')).toHaveText('1');
+    await expect(
+      page.locator('main').getByRole('heading', { level: 2, name: /Favourites/ }),
+    ).toHaveCount(0);
+  });
+
+  test('restoring a favourite resets quantity to 1 even if it had more in cart', async ({ page }) => {
+    await page.goto('/');
+    await addToCartFromHome(page, productTitles[0]);
+    await openCartFromHeader(page);
+
+    const increase = page.locator('main').getByRole('button', { name: 'Increase quantity' });
+    await increase.click();
+    await increase.click();
+    await expect(page.locator('main').getByTestId('item-quantity')).toHaveText('3');
+
+    await page
+      .locator('main')
+      .getByRole('button', { name: `Add ${productTitles[0]} to favourites` })
+      .click();
+    await expect(page.getByText('Your cart is empty')).toBeVisible();
+
+    await page
+      .locator('main')
+      .getByRole('button', { name: `Move to Cart: ${productTitles[0]}` })
+      .click();
+
+    await expect(page.locator('main').getByTestId('item-quantity')).toHaveText('1');
+  });
 });
