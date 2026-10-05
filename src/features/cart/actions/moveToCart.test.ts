@@ -8,7 +8,7 @@ import { mockProduct, randomSessionId } from '@/features/cart/test-utils/actionM
 import { moveToCart } from './moveToCart';
 
 const mockCookieJar = new Map<string, string>();
-const mockGetProduct = jest.fn();
+const mockFindProduct = jest.fn();
 const mockRevalidatePath = jest.fn();
 
 jest.mock('@/shared/lib/prisma', () => {
@@ -30,9 +30,13 @@ jest.mock('next/cache', () => ({
   revalidatePath: (...args: unknown[]) => mockRevalidatePath(...args),
 }));
 
-jest.mock('@/features/products/api/products', () => ({
-  getProduct: (...args: unknown[]) => mockGetProduct(...args),
-}));
+jest.mock('@/features/cart/lib/findProduct', () => {
+  const actual = jest.requireActual('@/features/cart/lib/findProduct');
+  return {
+    ...actual,
+    findProduct: (...args: unknown[]) => mockFindProduct(...args),
+  };
+});
 
 const usedSessions: string[] = [];
 
@@ -45,9 +49,9 @@ function session() {
 describeWithDb('moveToCart', () => {
   beforeEach(() => {
     mockCookieJar.clear();
-    mockGetProduct.mockReset();
+    mockFindProduct.mockReset();
     mockRevalidatePath.mockReset();
-    mockGetProduct.mockImplementation(async (id: string) => mockProduct(Number(id)));
+    mockFindProduct.mockImplementation(async (id: number) => mockProduct(id));
   });
 
   afterEach(async () => {
@@ -59,11 +63,11 @@ describeWithDb('moveToCart', () => {
     await prisma.$disconnect();
   });
 
-  it('removes the favourite row and returns the product re-derived from the API', async () => {
+  it('removes the favourite row and returns the product re-derived from the catalog', async () => {
     const sessionId = session();
     mockCookieJar.set(CART_SESSION_COOKIE, sessionId);
     await prisma.favouriteItem.create({ data: { sessionId, productId: 4 } });
-    mockGetProduct.mockResolvedValue(mockProduct(4, { price: 12.5 }));
+    mockFindProduct.mockResolvedValue(mockProduct(4, { price: 12.5 }));
 
     const result = await moveToCart(4);
 
@@ -109,11 +113,11 @@ describeWithDb('moveToCart', () => {
     expect(result).toEqual({ ok: false, error: 'Not a favourite' });
   });
 
-  it('keeps the favourite row when the product no longer exists in the API', async () => {
+  it('keeps the favourite row when the product no longer exists in the catalog', async () => {
     const sessionId = session();
     mockCookieJar.set(CART_SESSION_COOKIE, sessionId);
     await prisma.favouriteItem.create({ data: { sessionId, productId: 9 } });
-    mockGetProduct.mockRejectedValue(new Error('Product with ID 9 not found'));
+    mockFindProduct.mockResolvedValueOnce(null);
 
     const result = await moveToCart(9);
 

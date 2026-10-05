@@ -1,6 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { CartProvider, useCart } from './CartContext';
-import { mockCategory } from '@/shared/test-utils/product';
 
 // Test component to use the cart context
 const TestComponent = () => {
@@ -33,7 +32,7 @@ const TestComponent = () => {
           title: 'Product 1',
           price: 29.99,
           description: 'Test product 1',
-          category: mockCategory('electronics'),
+          category: 'electronics',
           images: ['/product1.jpg'],
           thumbnail: '/product1.jpg',
           quantity: 1
@@ -48,7 +47,7 @@ const TestComponent = () => {
           title: 'Product 2',
           price: 19.50,
           description: 'Test product 2',
-          category: mockCategory('clothing'),
+          category: 'clothing',
           images: ['/product2.jpg'],
           thumbnail: '/product2.jpg',
           quantity: 1

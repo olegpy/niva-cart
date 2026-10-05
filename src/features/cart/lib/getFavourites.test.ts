@@ -9,7 +9,7 @@ import { getFavourites } from './getFavourites';
 
 const mockCookieJar = new Map<string, string>();
 const mockSet = jest.fn();
-const mockGetProduct = jest.fn();
+const mockFindProduct = jest.fn();
 
 jest.mock('@/shared/lib/prisma', () => {
   const { PrismaClient } = jest.requireActual('@prisma/client');
@@ -24,9 +24,13 @@ jest.mock('next/headers', () => ({
   }),
 }));
 
-jest.mock('@/features/products/api/products', () => ({
-  getProduct: (...args: unknown[]) => mockGetProduct(...args),
-}));
+jest.mock('@/features/cart/lib/findProduct', () => {
+  const actual = jest.requireActual('@/features/cart/lib/findProduct');
+  return {
+    ...actual,
+    findProduct: (...args: unknown[]) => mockFindProduct(...args),
+  };
+});
 
 const usedSessions: string[] = [];
 
@@ -40,8 +44,8 @@ describeWithDb('getFavourites', () => {
   beforeEach(() => {
     mockCookieJar.clear();
     mockSet.mockReset();
-    mockGetProduct.mockReset();
-    mockGetProduct.mockImplementation(async (id: string) => mockProduct(Number(id)));
+    mockFindProduct.mockReset();
+    mockFindProduct.mockImplementation(async (id: number) => mockProduct(id));
   });
 
   afterEach(async () => {
@@ -90,7 +94,7 @@ describeWithDb('getFavourites', () => {
     await expect(getFavourites()).resolves.toEqual([]);
   });
 
-  it('skips products the API no longer returns', async () => {
+  it('skips products the catalog no longer has', async () => {
     const sessionId = session();
     mockCookieJar.set(CART_SESSION_COOKIE, sessionId);
     await prisma.favouriteItem.createMany({
@@ -99,9 +103,9 @@ describeWithDb('getFavourites', () => {
         { sessionId, productId: 404 },
       ],
     });
-    mockGetProduct.mockImplementation(async (id: string) => {
-      if (id === '404') throw new Error('Product with ID 404 not found');
-      return mockProduct(Number(id));
+    mockFindProduct.mockImplementation(async (id: number) => {
+      if (id === 404) return null;
+      return mockProduct(id);
     });
 
     const items = await getFavourites();

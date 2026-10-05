@@ -8,7 +8,7 @@ import { mockProduct, randomSessionId } from '@/features/cart/test-utils/actionM
 import { addToFavourites } from './addToFavourites';
 
 const mockCookieJar = new Map<string, string>();
-const mockGetProduct = jest.fn();
+const mockFindProduct = jest.fn();
 const mockRevalidatePath = jest.fn();
 
 jest.mock('@/shared/lib/prisma', () => {
@@ -30,9 +30,13 @@ jest.mock('next/cache', () => ({
   revalidatePath: (...args: unknown[]) => mockRevalidatePath(...args),
 }));
 
-jest.mock('@/features/products/api/products', () => ({
-  getProduct: (...args: unknown[]) => mockGetProduct(...args),
-}));
+jest.mock('@/features/cart/lib/findProduct', () => {
+  const actual = jest.requireActual('@/features/cart/lib/findProduct');
+  return {
+    ...actual,
+    findProduct: (...args: unknown[]) => mockFindProduct(...args),
+  };
+});
 
 const createdSessions: string[] = [];
 
@@ -45,9 +49,9 @@ function useSession(sessionId = randomSessionId()) {
 describeWithDb('addToFavourites', () => {
   beforeEach(() => {
     mockCookieJar.clear();
-    mockGetProduct.mockReset();
+    mockFindProduct.mockReset();
     mockRevalidatePath.mockReset();
-    mockGetProduct.mockImplementation(async (id: string) => mockProduct(Number(id)));
+    mockFindProduct.mockImplementation(async (id: number) => mockProduct(id));
   });
 
   afterEach(async () => {
@@ -89,15 +93,15 @@ describeWithDb('addToFavourites', () => {
       const result = await addToFavourites(productId);
 
       expect(result).toEqual({ ok: false, error: 'Invalid product' });
-      expect(mockGetProduct).not.toHaveBeenCalled();
+      expect(mockFindProduct).not.toHaveBeenCalled();
       expect(mockCookieJar.has(CART_SESSION_COOKIE)).toBe(false);
       expect(mockRevalidatePath).not.toHaveBeenCalled();
     },
   );
 
-  it('rejects a product the API does not know', async () => {
+  it('rejects a product the catalog does not know', async () => {
     const sessionId = useSession();
-    mockGetProduct.mockRejectedValue(new Error('Product with ID 999 not found'));
+    mockFindProduct.mockResolvedValueOnce(null);
 
     const result = await addToFavourites(999);
 
