@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   // Enable React 15 features compatibility
   reactStrictMode: true,
   transpilePackages: ["@niva/support-realtime"],
+  serverExternalPackages: ["@prisma/client", "prisma"],
 
   images: {
     unoptimized: false,

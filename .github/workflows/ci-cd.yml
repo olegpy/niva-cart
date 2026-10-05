@@ -30,7 +30,23 @@ jobs:
   lighthouse:
     runs-on: ubuntu-latest
     needs: test
-
+    # Home page queries Prisma at build time; keep credentials in sync with docker-compose.yml.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: niva
+          POSTGRES_PASSWORD: niva
+          POSTGRES_DB: niva_cart
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U niva -d niva_cart"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://niva:niva@localhost:5432/niva_cart
     steps:
       - uses: actions/checkout@v4
 
@@ -42,8 +58,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Write Prisma env file
+        run: |
+          printf 'DATABASE_URL=%s\n' "$DATABASE_URL" > .env
+          printf 'DATABASE_URL=%s\n' "$DATABASE_URL" > .env.production
+
+      - name: Apply database migrations
+        run: npx prisma migrate deploy
+
+      - name: Seed catalog
+        run: npm run db:seed
+
       - name: Build application
         run: npm run build
+        env:
+          DATABASE_URL: postgresql://niva:niva@localhost:5432/niva_cart
 
       - name: Start production server
         run: |
@@ -53,6 +82,8 @@ jobs:
           echo "Checking if server is ready..."
           curl -f http://localhost:3000 || exit 1
           echo "Server is ready!"
+        env:
+          DATABASE_URL: postgresql://niva:niva@localhost:5432/niva_cart
 
       - name: Run Lighthouse performance check
         run: |
