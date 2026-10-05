@@ -3,6 +3,8 @@ import { getProduct } from "@/features/products/api/products";
 import ProductDetails from "@/features/products/components/ProductDetails";
 import type { Product } from '@/features/products/types';
 
+export const dynamic = 'force-dynamic';
+
 type ProductPageProps = {
   params: Promise<{ id: string }>
 }

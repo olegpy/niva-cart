@@ -1,10 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 import { seedUsers } from './seeds/users';
+import { seedProducts } from './seeds/products';
 
 const prisma = new PrismaClient();
 
 async function main() {
   await seedUsers(prisma);
+  await seedProducts(prisma);
 }
 
 main()

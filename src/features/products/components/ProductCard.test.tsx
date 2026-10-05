@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import ProductCard from './ProductCard';
 import { Product } from '@/features/products/types';
-import { mockCategory } from '@/shared/test-utils/product';
 import { CartProvider } from '@/features/cart/context/CartContext';
 
 // Wrapper component for testing
@@ -16,7 +15,7 @@ const mockProduct: Product = {
   description: 'Test Description',
   images: ['/test-image.jpg'],
   thumbnail: '/test-image.jpg',
-  category: mockCategory('test-category'),
+  category: 'test-category',
   quantity: 1
 };
 
@@ -27,7 +26,7 @@ const mockOutOfStockProduct: Product = {
   description: 'Out of Stock Description',
   images: ['/out-of-stock-image.jpg'],
   thumbnail: '/out-of-stock-image.jpg',
-  category: mockCategory('test-category'),
+  category: 'test-category',
   quantity: 0
 };
 

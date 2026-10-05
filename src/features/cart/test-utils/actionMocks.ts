@@ -1,5 +1,4 @@
 import type { Product } from '@/features/products/types';
-import { mockCategory } from '@/shared/test-utils/product';
 
 export function mockProduct(id: number, overrides: Partial<Product> = {}): Product {
   return {
@@ -7,7 +6,7 @@ export function mockProduct(id: number, overrides: Partial<Product> = {}): Produ
     title: `Product ${id}`,
     price: 10 * id,
     description: `Description ${id}`,
-    category: mockCategory('electronics'),
+    category: 'electronics',
     images: [`/product-${id}.jpg`],
     thumbnail: `/product-${id}.jpg`,
     quantity: 10,

@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CartProvider, useCart } from '@/features/cart/context/CartContext';
 import { moveToCart } from '@/features/cart/actions/moveToCart';
-import { mockCategory } from '@/shared/test-utils/product';
 import type { Product } from '@/features/products/types';
 import type { FavouriteProduct } from '@/features/cart/types';
 import { FavouritesSection } from './FavouritesSection';
@@ -19,7 +18,7 @@ const lamp: Product = {
   title: 'Desk Lamp',
   price: 24.5,
   description: 'A desk lamp',
-  category: mockCategory('home'),
+  category: 'home',
   images: ['/lamp.jpg'],
   thumbnail: '/lamp.jpg',
   quantity: 10,

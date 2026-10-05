@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
 import CartItem from './CartItem';
 import { Product } from '@/features/products/types';
-import { mockCategory } from '@/shared/test-utils/product';
 import { CartProvider, useCart } from '@/features/cart/context/CartContext';
 import { addToFavourites } from '@/features/cart/actions/addToFavourites';
 
@@ -17,7 +16,7 @@ const mockProduct: Product = {
   title: 'Test Product',
   price: 29.99,
   description: 'A test product description',
-  category: mockCategory('electronics'),
+  category: 'electronics',
   images: ['/test-image.jpg'],
   thumbnail: '/test-image.jpg',
   quantity: 10,

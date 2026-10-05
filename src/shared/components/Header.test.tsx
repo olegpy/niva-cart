@@ -2,7 +2,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Header from './Header';
 import { CartProvider, useCart } from '@/features/cart/context/CartContext';
 import { Product } from '@/features/products/types';
-import { mockCategory } from '@/shared/test-utils/product';
 
 jest.mock('@/features/cart/actions/addToFavourites', () => ({
   addToFavourites: jest.fn(),
@@ -29,7 +28,7 @@ describe(Header.name, () => {
     title: 'Test Product',
     price: 29.99,
     description: 'A test product',
-    category: mockCategory('test'),
+    category: 'test',
     images: ['/test-image.jpg'],
     thumbnail: '/test-image.jpg',
     quantity: 1

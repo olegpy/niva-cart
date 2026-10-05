@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import ProductDetails from './ProductDetails';
 import { Product } from '@/features/products/types';
-import { mockCategory } from '@/shared/test-utils/product';
 import { CartProvider } from '@/features/cart/context/CartContext';
 
 // Wrapper component for testing
@@ -16,7 +15,7 @@ const mockProduct: Product = {
   description: 'Test Description',
   thumbnail: '/test-image.jpg',
   images: ['/test-image.jpg'],
-  category: mockCategory('test-category'),
+  category: 'test-category',
   quantity: 10
 };
 
