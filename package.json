@@ -30,9 +30,6 @@
     "db:reset": "prisma migrate reset",
     "postinstall": "prisma generate"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "dependencies": {
     "@niva/support-realtime": "*",
     "@prisma/client": "^6.19.3",
