@@ -15,8 +15,7 @@ module.exports = {
       uploadThroughputKbps: 0
     },
     
-    // Screen emulation
-    emulatedFormFactor: 'mobile',
+    formFactor: 'mobile',
     screenEmulation: {
       mobile: true,
       width: 375,
@@ -37,7 +36,6 @@ module.exports = {
     
     // Skip certain audits
     skipAudits: [
-      'uses-http2',
       'redirects-http'
     ]
   },
