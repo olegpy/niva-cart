@@ -17,6 +17,13 @@ enum ChatStatus {
   closed
 }
 
+enum OrderStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -25,6 +32,7 @@ model User {
   role      UserRole @default(customer)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orders    Order[]
 }
 
 model SupportChat {
@@ -73,6 +81,38 @@ model Product {
   images      String[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  orderItems  OrderItem[]
 
   @@index([category])
+}
+
+model Order {
+  id                    String      @id @default(cuid())
+  userId                String
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Restrict)
+  stripeSessionId       String      @unique
+  stripePaymentIntentId String?
+  status                OrderStatus @default(pending)
+  total                 Int
+  currency              String      @db.VarChar(3)
+  customerEmail         String
+  items                 OrderItem[]
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([status])
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  orderId        String
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId      Int?
+  product        Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  titleSnapshot  String
+  price          Int
+  quantity       Int
+
+  @@index([orderId])
 }

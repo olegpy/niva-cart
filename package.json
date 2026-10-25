@@ -40,6 +40,8 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "socket.io-client": "^4.8.3",
+    "sonner": "^2.0.8",
+    "stripe": "^23.0.0",
     "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
