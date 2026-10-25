@@ -26,3 +26,9 @@ jest.mock('next/navigation', () => ({
     return '';
   },
 }));
+
+beforeEach(() => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    window.localStorage.clear();
+  }
+});

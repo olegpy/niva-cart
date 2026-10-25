@@ -3,6 +3,7 @@
 import { useCart } from "@/features/cart/context/CartContext";
 import CartItem from "./CartItem";
 import CartSummary from "./CartSummary";
+import { CheckoutButton } from "./CheckoutButton";
 
 export default function CartItems() {
     const { items } = useCart();
@@ -27,6 +28,7 @@ export default function CartItems() {
             </div>
             <div className="mt-8 flex justify-between items-center">
                 <CartSummary showClearButton={true} />
+                <CheckoutButton />
             </div>
         </div>
     );

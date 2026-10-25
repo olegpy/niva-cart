@@ -1,11 +1,13 @@
 'use client';
 import {Product} from "@/features/products/types";
-import {createContext, ReactNode, use, useCallback, useMemo, useState} from "react";
-
-interface CartItem {
-    product: Product;
-    quantity: number;
-}
+import {
+    type CartItem,
+    getCartSnapshot,
+    getServerCartSnapshot,
+    subscribeToCart,
+    updateCart,
+} from "@/features/cart/lib/cartStore";
+import {createContext, ReactNode, use, useCallback, useMemo, useSyncExternalStore} from "react";
 
 interface CartContextType {
     items: CartItem[];
@@ -23,10 +25,10 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({children}: {children: ReactNode}) {
-    const [items, setItems] = useState<CartItem[]>([]);
+    const items = useSyncExternalStore(subscribeToCart, getCartSnapshot, getServerCartSnapshot);
 
     const addToCart = useCallback((product: Product) => {
-        setItems((currentItems) => {
+        updateCart((currentItems) => {
             const existingItem = currentItems.find((item) => item.product.id === product.id);
             if (existingItem) {
                 return currentItems.map((item) =>
@@ -40,13 +42,13 @@ export function CartProvider({children}: {children: ReactNode}) {
     }, []);
 
     const removeFromCart = useCallback((productId: number) => {
-        setItems((currentItems) => 
+        updateCart((currentItems) =>
             currentItems.filter((item) => item.product.id !== productId)
         );
     }, []);
 
     const incrementQuantity = useCallback((productId: number) => {
-        setItems((currentItems) =>
+        updateCart((currentItems) =>
             currentItems.map((item) =>
                 item.product.id === productId
                     ? { ...item, quantity: item.quantity + 1 }
@@ -56,7 +58,7 @@ export function CartProvider({children}: {children: ReactNode}) {
     }, []);
 
     const decrementQuantity = useCallback((productId: number) => {
-        setItems((currentItems) => {
+        updateCart((currentItems) => {
             const updatedItems = currentItems.map((item) =>
                 item.product.id === productId
                     ? { ...item, quantity: Math.max(0, item.quantity - 1) }
@@ -68,7 +70,7 @@ export function CartProvider({children}: {children: ReactNode}) {
     }, []);
 
     const clearCart = useCallback(() => {
-        setItems([]);
+        updateCart(() => []);
     }, []);
 
     const getCartTotal = useCallback(() => {
