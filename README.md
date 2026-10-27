@@ -51,6 +51,39 @@ npm run test:e2e     # Playwright (see e2e/ for setup)
 
 For local Postgres: `docker compose up -d`, then `npm run db:migrate`. See **Admin authentication** below for env vars and seed. Live support chat also needs `npm run socket:dev` — details in [`packages/socket-server/README.md`](./packages/socket-server/README.md).
 
+### Stripe webhooks — required for local checkout
+
+**You cannot test real Stripe payments locally without the Stripe CLI running.** `localhost:3000` isn't reachable from Stripe's servers, so webhooks never arrive and no `Order` row is ever created. The CLI opens a WebSocket to Stripe and forwards incoming events to `/api/webhooks/stripe`.
+
+Install once:
+
+```bash
+brew install stripe/stripe-cli/stripe   # macOS
+stripe login
+```
+
+Then, **every local dev session that touches checkout** (in a separate terminal, kept open):
+
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+```
+
+Copy the `whsec_...` the command prints into `.env` as `STRIPE_WEBHOOK_SECRET` and restart `npm run dev`. The secret is stable per CLI auth — set it once, keep it until you `stripe logout`.
+
+When you **don't** need `stripe listen` running:
+
+| Doing this | `stripe listen` needed? |
+|---|---|
+| Jest unit tests (`npm test`) | ❌ Stripe is mocked |
+| Playwright e2e (`npm run test:e2e`) | ❌ Orders are seeded directly |
+| UI work on `/checkout/success` or `/admin/orders` | ❌ Seed an Order row manually or hit the URL directly |
+| Clicking **Checkout** and completing a Stripe test card | ✅ **Required** |
+| Any work on the webhook handler itself | ✅ **Required** |
+
+Rule of thumb: if you're about to pay through Stripe in test mode, open the terminal and start `stripe listen`. If `stripe listen` returns `400 Invalid signature`, your `.env` `STRIPE_WEBHOOK_SECRET` is out of sync with the CLI — copy the current `whsec_...` and restart `npm run dev`.
+
+Production doesn't use the CLI at all — see the [Vercel environment variables](#vercel-environment-variables) section for the dashboard-webhook setup.
+
 ## Admin authentication
 
 Admin login uses **next-auth v4** with **Credentials** (email + password). Only users with `role: admin` and a `passwordHash` in the database can sign in. Customer accounts have no password.
@@ -65,6 +98,14 @@ Add to `.env` (see `.env.example`):
 DATABASE_URL=postgresql://niva:niva@localhost:5432/niva_cart
 NEXTAUTH_SECRET=...          # openssl rand -base64 32
 NEXTAUTH_URL=http://localhost:3000
+
+# Stripe payments
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+# Optional — default to `${NEXTAUTH_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`
+STRIPE_CHECKOUT_SUCCESS_URL=
+# Optional — defaults to `${NEXTAUTH_URL}/checkout/cancel`
+STRIPE_CHECKOUT_CANCEL_URL=
 ```
 
 ```bash

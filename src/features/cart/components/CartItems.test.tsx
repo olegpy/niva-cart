@@ -6,6 +6,10 @@ jest.mock('@/features/cart/actions/addToFavourites', () => ({
   addToFavourites: jest.fn(),
 }));
 
+jest.mock('@/features/payments/actions/createCheckoutSession', () => ({
+  createCheckoutSession: jest.fn(),
+}));
+
 // Mock the useCart hook
 jest.mock('@/features/cart/context/CartContext', () => ({
   ...jest.requireActual('@/features/cart/context/CartContext'),
